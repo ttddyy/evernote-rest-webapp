@@ -2,7 +2,7 @@ package net.ttddyy.evernote.rest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.social.evernote.api.Evernote;
-import org.springframework.social.evernote.api.NoteStoreOperations;
+import org.springframework.social.evernote.api.StoreOperations;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/noteStore")
-public class NoteStoreController extends AbstractStoreController<NoteStoreOperations> {
+public class NoteStoreController extends AbstractStoreController {
 
 	@Autowired
 	private Evernote evernote;
 
 	@Override
-	public NoteStoreOperations getStoreOperations() {
+	public StoreOperations getStoreOperations() {
 		return evernote.noteStoreOperations();
 	}
 

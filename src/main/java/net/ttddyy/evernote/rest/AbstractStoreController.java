@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.social.evernote.api.StoreClientHolder;
+import org.springframework.social.evernote.api.StoreOperations;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,14 +18,14 @@ import java.lang.reflect.Method;
 /**
  * @author Tadaya Tsuyukubo
  */
-public abstract class AbstractStoreController<T> {
+public abstract class AbstractStoreController {
 
-	protected abstract T getStoreOperations();
+	protected abstract StoreOperations getStoreOperations();
 
 	@RequestMapping(value = "/{methodName}", method = RequestMethod.POST)
 	public Object invoke(@PathVariable String methodName, @RequestBody JsonNode jsonNode) {
 
-		final T storeOperations = getStoreOperations();
+		final StoreOperations storeOperations = getStoreOperations();
 		final Class<?> storeOperationsClass = storeOperations.getClass();
 
 		// In ~StoreClient class, method names are currently unique. passing null to paramTypes arg means find method by name.
@@ -42,7 +43,7 @@ public abstract class AbstractStoreController<T> {
 	/**
 	 * Based on received json, deserialize parameters.
 	 */
-	private Object[] resolveParameters(T storeOperations, Method method, JsonNode jsonNode) {
+	private Object[] resolveParameters(StoreOperations storeOperations, Method method, JsonNode jsonNode) {
 
 		final String methodName = method.getName();
 		final Class<?>[] parameterTypes = method.getParameterTypes();
@@ -56,7 +57,7 @@ public abstract class AbstractStoreController<T> {
 		return resolveParameterValues(parameterTypes, parameterNames, jsonNode);
 	}
 
-	private String[] resolveParameterNames(T storeOperations, String methodName) {
+	private String[] resolveParameterNames(StoreOperations storeOperations, String methodName) {
 		// Cannot retrieve parameter names from interface, even though classes are compiled with debugging information.
 		// Since ~StoreClient class which is an underlying implementation class of ~StoreOperations uses same parameter
 		// names. So, use parameter names from ~StoreClient impl class for now.
