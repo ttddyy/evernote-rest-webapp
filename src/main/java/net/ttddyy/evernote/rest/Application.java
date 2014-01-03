@@ -4,8 +4,10 @@ import com.evernote.auth.EvernoteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.*;
 import org.springframework.social.evernote.api.Evernote;
 import org.springframework.social.evernote.api.impl.EvernoteTemplate;
@@ -107,6 +109,16 @@ public class Application {
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(Application.class, args);
+	}
+
+	/**
+	 * To initialize application when it is deployed to web container as a war file.
+	 */
+	public static class ApplicationServletInitializer extends SpringBootServletInitializer {
+		@Override
+		protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+			return application.sources(Application.class);
+		}
 	}
 
 }
