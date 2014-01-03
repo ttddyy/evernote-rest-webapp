@@ -2,15 +2,14 @@ package net.ttddyy.evernote.rest;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.social.evernote.api.Evernote;
 import org.springframework.social.evernote.api.StoreClientHolder;
 import org.springframework.social.evernote.api.StoreOperations;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -18,14 +17,17 @@ import java.lang.reflect.Method;
 /**
  * @author Tadaya Tsuyukubo
  */
-public abstract class AbstractStoreController {
+@RestController
+@RequestMapping("/{storeName:noteStore|userStore}")
+public class StoreOperationController {
 
-	protected abstract StoreOperations getStoreOperations();
+	@Autowired
+	private Evernote evernote;
 
 	@RequestMapping(value = "/{methodName}", method = RequestMethod.POST)
-	public Object invoke(@PathVariable String methodName, @RequestBody JsonNode jsonNode) {
+	public Object invoke(@PathVariable String storeName, @PathVariable String methodName, @RequestBody JsonNode jsonNode) {
 
-		final StoreOperations storeOperations = getStoreOperations();
+		final StoreOperations storeOperations = getStoreOperations(storeName);
 		final Class<?> storeOperationsClass = storeOperations.getClass();
 
 		// In ~StoreClient class, method names are currently unique. passing null to paramTypes arg means find method by name.
@@ -38,6 +40,14 @@ public abstract class AbstractStoreController {
 		final Object[] params = resolveParameters(storeOperations, method, jsonNode);
 		ReflectionUtils.makeAccessible(method);  // TODO: need this? since it uses interface, all methods are public...
 		return ReflectionUtils.invokeMethod(method, storeOperations, params);
+	}
+
+	private StoreOperations getStoreOperations(String storeName) {
+		if ("noteStore".equals(storeName)) {
+			return evernote.noteStoreOperations();
+		} else {
+			return evernote.userStoreOperations();
+		}
 	}
 
 	/**
