@@ -31,7 +31,7 @@ public class Application {
 
 
 	@Configuration
-	@ConfigurationProperties(name = "evernote")
+	@ConfigurationProperties("evernote")
 	public static class EvernotePropertiesConfiguration {
 
 		public String consumerKey;
