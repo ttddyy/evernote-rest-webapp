@@ -15,6 +15,8 @@ import org.springframework.social.evernote.connect.EvernoteConnectionFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.WebRequest;
 
+import javax.validation.constraints.NotNull;
+
 /**
  * Evernote Rest Webapp application and configuration.
  *
@@ -34,8 +36,11 @@ public class Application {
 	@ConfigurationProperties("evernote")
 	public static class EvernotePropertiesConfiguration {
 
+		@NotNull
 		public String consumerKey;
+		@NotNull
 		public String consumerSecret;
+
 		public String accessToken;
 		public boolean alwaysUseTokenFromConfig;
 		public boolean fallbackToTokenFromConfig;
