@@ -9,15 +9,10 @@ import org.objenesis.Objenesis;
 import org.objenesis.ObjenesisStd;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
-import org.springframework.context.ApplicationContextInitializer;
-import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.core.env.ConfigurableEnvironment;
-import org.springframework.core.env.MapPropertySource;
-import org.springframework.core.env.MutablePropertySources;
 import org.springframework.http.MediaType;
 import org.springframework.social.evernote.api.Evernote;
 import org.springframework.social.evernote.api.NoteStoreOperations;
@@ -30,9 +25,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.WebRequest;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -47,7 +39,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @ContextConfiguration(
 		classes = {Application.class, StoreOperationControllerIntegrationTest.MockEvernoteConfig.class},
 		loader = SpringApplicationContextLoader.class,
-		initializers = StoreOperationControllerIntegrationTest.TestInitializer.class
+		initializers = IntegrationTestInitializer.class
 )
 public class StoreOperationControllerIntegrationTest {
 
@@ -69,21 +61,6 @@ public class StoreOperationControllerIntegrationTest {
 		}
 
 	}
-
-	public static class TestInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
-		@Override
-		public void initialize(ConfigurableApplicationContext applicationContext) {
-			// hardcode required system properties values
-			Map<String, Object> map = new HashMap<String, Object>();
-			map.put("evernote.consumerKey", "test_consumer_key");
-			map.put("evernote.consumerSecret", "test_consumer_secret");
-
-			ConfigurableEnvironment environment = applicationContext.getEnvironment();
-			MutablePropertySources propertySources = environment.getPropertySources();
-			propertySources.addFirst(new MapPropertySource("override", map));
-		}
-	}
-
 
 	@Autowired
 	private WebApplicationContext wac;
