@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.SpringApplicationContextLoader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.http.MediaType;
 import org.springframework.social.evernote.api.Evernote;
 import org.springframework.social.evernote.api.NoteStoreOperations;
@@ -24,13 +22,12 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.request.WebRequest;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
- * This test class uses mock in static variables, so this test class cannot run in parallel.
+ * Test class for {@link StoreOperationController}
  *
  * @author Tadaya Tsuyukubo
  */
@@ -43,21 +40,16 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 )
 public class StoreOperationControllerIntegrationTest {
 
-	private static NoteStoreOperations noteStoreOperations;
-	private static UserStoreOperations userStoreOperations;
-
 	/**
-	 * Configuration class to override a request scoped Evernote bean to return a mock.
+	 * Configuration class to override a request scoped Evernote bean to a singleton bean to return a mock.
 	 */
 	@Configuration
 	public static class MockEvernoteConfig {
+		// currently evernote bean is only returning ~StoreOperations mocks.
+		// In future, if evernote bean gets tainted, need to change the scope to prototpye or reset the mock.
 		@Bean
-		@Scope(value = WebApplicationContext.SCOPE_REQUEST, proxyMode = ScopedProxyMode.INTERFACES)
-		public Evernote evernote(WebRequest request) {
-			Evernote evernote = mock(Evernote.class);
-			when(evernote.userStoreOperations()).thenReturn(userStoreOperations);
-			when(evernote.noteStoreOperations()).thenReturn(noteStoreOperations);
-			return evernote;
+		public Evernote evernote() {
+			return mock(Evernote.class);
 		}
 
 	}
@@ -67,13 +59,21 @@ public class StoreOperationControllerIntegrationTest {
 
 	private MockMvc mockMvc;
 
+	@Autowired
+	private Evernote evernote;
+
+	private NoteStoreOperations noteStoreOperations;
+
+	private UserStoreOperations userStoreOperations;
+
+
 	@Before
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
 
 		// prepare mocks
-		noteStoreOperations = mock(NoteStoreOperations.class, withSettings().extraInterfaces(StoreClientHolder.class));
-		userStoreOperations = mock(UserStoreOperations.class, withSettings().extraInterfaces(StoreClientHolder.class));
+		this.noteStoreOperations = mock(NoteStoreOperations.class, withSettings().extraInterfaces(StoreClientHolder.class));
+		this.userStoreOperations = mock(UserStoreOperations.class, withSettings().extraInterfaces(StoreClientHolder.class));
 
 		// To work around getClass() method to return actual store-client class for parameter name discovery, use
 		// objenesis to create actual impl class instead of mocking.
@@ -83,6 +83,9 @@ public class StoreOperationControllerIntegrationTest {
 		NoteStoreClient noteStoreClient = (NoteStoreClient) objenesis.newInstance(NoteStoreClient.class);
 		when(((StoreClientHolder) userStoreOperations).getStoreClient()).thenReturn(userStoreClient);
 		when(((StoreClientHolder) noteStoreOperations).getStoreClient()).thenReturn(noteStoreClient);
+
+		when(this.evernote.userStoreOperations()).thenReturn(userStoreOperations);
+		when(this.evernote.noteStoreOperations()).thenReturn(noteStoreOperations);
 	}
 
 	@Test
