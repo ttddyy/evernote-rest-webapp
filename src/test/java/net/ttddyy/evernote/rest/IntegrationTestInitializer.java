@@ -21,6 +21,9 @@ public class IntegrationTestInitializer implements ApplicationContextInitializer
 		map.put("evernote.consumerKey", "test_consumer_key");
 		map.put("evernote.consumerSecret", "test_consumer_secret");
 
+		// disable jmx export for test to avoid InstanceAlreadyExistsException for multiple SpringBoot app contexts
+		map.put("endpoints.jmx.enabled", "false");
+
 		ConfigurableEnvironment environment = applicationContext.getEnvironment();
 		MutablePropertySources propertySources = environment.getPropertySources();
 		propertySources.addFirst(new MapPropertySource("override", map));
