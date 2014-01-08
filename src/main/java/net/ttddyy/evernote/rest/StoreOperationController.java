@@ -1,6 +1,5 @@
 package net.ttddyy.evernote.rest;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +17,6 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -63,39 +61,27 @@ public class StoreOperationController {
 	private Object[] resolveParameters(StoreOperations storeOperations, Method method, JsonNode jsonNode) {
 
 		final String methodName = method.getName();
-		final String[] parameterNames = resolveParameterNames(storeOperations, methodName);
+		// Cannot retrieve parameter names from interface, even though classes are compiled with debugging information.
+		// Since ~StoreClient class which is an underlying implementation class of ~StoreOperations uses same parameter
+		// names. So, use parameter names from ~StoreClient impl class for now.
+		// Java8 with StandardReflectionParameterNameDiscoverer class, it may be possible to retrieve param names from
+		// interface. (haven't checked)
+		final Method actualMethod = resolveActualMethod(storeOperations, methodName);
+		final String[] parameterNames = resolveParameterNames(actualMethod);
 		if (parameterNames == null) {
 			final String message = String.format("Cannot find parameter names for method=[%s].", methodName);
 			throw new EvernoteRestException(message);
 		}
 
-		final Method actualMethod = resolveActualMethod(storeOperations, method);
-		return resolveParameterValues(actualMethod, jsonNode);
+		// to allow jackson to map generic type in collection appropriately, such as List<Long> or List<Short>,
+		// object mapper requires JavaType to be provided. Otherwise, generics for number gets default to List<Integer>.
+		final JavaType[] parameterJavaTypes = resolveMethodParameterJavaTypes(actualMethod);
+		return resolveParameterValues(parameterNames, parameterJavaTypes, jsonNode);
 	}
 
-	private Method resolveActualMethod(StoreOperations storeOperations, Method method) {
-		// Cannot retrieve parameter names from interface, even though classes are compiled with debugging information.
-		// Since ~StoreClient class which is an underlying implementation class of ~StoreOperations uses same parameter
-		// names. So, use parameter names from ~StoreClient impl class for now.
-		// Java8 with StandardReflectionParameterNameDiscoverer class, it may be possible to retrieve param names from
-		// interface. (haven't checked)
-		final String methodName = method.getName();
+	private Method resolveActualMethod(StoreOperations storeOperations, String methodName) {
 		final Class<?> storeClientClass = ((StoreClientHolder) storeOperations).getStoreClient().getClass();
-		final Method actualMethod = ReflectionUtils.findMethod(storeClientClass, methodName, null);  // find by name
-		return actualMethod;
-	}
-
-	private String[] resolveParameterNames(StoreOperations storeOperations, String methodName) {
-		// Cannot retrieve parameter names from interface, even though classes are compiled with debugging information.
-		// Since ~StoreClient class which is an underlying implementation class of ~StoreOperations uses same parameter
-		// names. So, use parameter names from ~StoreClient impl class for now.
-		// Java8 with StandardReflectionParameterNameDiscoverer class, it may be possible to retrieve param names from
-		// interface. (haven't checked)
-		final Class<?> storeClientClass = ((StoreClientHolder) storeOperations).getStoreClient().getClass();
-		final Method method = ReflectionUtils.findMethod(storeClientClass, methodName, null);  // find by name
-
-		final ParameterNameDiscoverer discoverer = new DefaultParameterNameDiscoverer();
-		return discoverer.getParameterNames(method);
+		return ReflectionUtils.findMethod(storeClientClass, methodName, null);  // find by name
 	}
 
 	private String[] resolveParameterNames(Method actualMethod) {
@@ -104,14 +90,11 @@ public class StoreOperationController {
 	}
 
 
-	private Object[] resolveParameterValues(Method actualMethod, JsonNode jsonNode) {
+	private Object[] resolveParameterValues(String[] parameterNames, JavaType[] javaTypes, JsonNode jsonNode) {
 		final ObjectMapper objectMapper = new ObjectMapper();
 
-		final String[] parameterNames = resolveParameterNames(actualMethod);
-		final JavaType[] javaTypes = resolveJavaTypes(actualMethod, objectMapper);
-
 		// populate params
-		final int parameterSize = actualMethod.getParameterTypes().length;
+		final int parameterSize = parameterNames.length;
 		final Object[] params = new Object[parameterSize];
 
 		for (int i = 0; i < parameterSize; i++) {
@@ -135,14 +118,14 @@ public class StoreOperationController {
 		return params;
 	}
 
-	private JavaType[] resolveJavaTypes(Method actualMethod, ObjectMapper objectMapper) {
+	private JavaType[] resolveMethodParameterJavaTypes(Method actualMethod) {
+		final ObjectMapper objectMapper = new ObjectMapper();
 		final Class<?>[] parameterTypes = actualMethod.getParameterTypes();
 		final List<JavaType> javaTypes = new ArrayList<JavaType>(parameterTypes.length);
 		for (int i = 0; i < parameterTypes.length; i++) {
 			final Class<?> parameterType = parameterTypes[i];
 			final boolean isList = parameterType.isAssignableFrom(List.class);
 			final boolean isSet = parameterType.isAssignableFrom(Set.class);
-			final boolean isMap = parameterType.isAssignableFrom(Map.class);
 
 			final JavaType type;
 			if (isList || isSet) {
@@ -167,34 +150,5 @@ public class StoreOperationController {
 		}
 		return javaTypes.toArray(new JavaType[javaTypes.size()]);
 	}
-
-	private Object[] resolveParameterValues(Class<?>[] parameterTypes, String[] parameterNames, JsonNode jsonNode) {
-		final ObjectMapper objectMapper = new ObjectMapper();
-
-		// populate params
-		final int parameterSize = parameterTypes.length;
-		final Object[] params = new Object[parameterSize];
-
-		for (int i = 0; i < parameterSize; i++) {
-			final Class<?> parameterType = parameterTypes[i];
-			final String parameterName = parameterNames[i];
-
-			if (jsonNode.has(parameterName)) {
-				final String subJson = jsonNode.get(parameterName).toString();
-				try {
-					final Object param = objectMapper.readValue(subJson, parameterType);
-					params[i] = param;
-				} catch (IOException e) {
-					final String message =
-							String.format("Cannot parse part of the json for parameter=[%s]. json=[%s]", parameterName, subJson);
-					throw new EvernoteRestException(message, e);
-				}
-			} else {
-				params[i] = null;  // if not included in json, then set as null  TODO: resolve default value??
-			}
-		}
-		return params;
-	}
-
 
 }
