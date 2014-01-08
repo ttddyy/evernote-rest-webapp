@@ -29,6 +29,9 @@ public class StoreOperationController {
 	@Autowired
 	private Evernote evernote;
 
+	@Autowired
+	private ObjectMapper objectMapper;
+
 	@RequestMapping(value = "/{methodName}", method = RequestMethod.POST)
 	public Object invoke(@PathVariable String storeName, @PathVariable String methodName, @RequestBody JsonNode jsonNode) {
 
@@ -91,7 +94,6 @@ public class StoreOperationController {
 
 
 	private Object[] resolveParameterValues(String[] parameterNames, JavaType[] javaTypes, JsonNode jsonNode) {
-		final ObjectMapper objectMapper = new ObjectMapper();
 
 		// populate params
 		final int parameterSize = parameterNames.length;
@@ -104,7 +106,7 @@ public class StoreOperationController {
 			if (jsonNode.has(parameterName)) {
 				final String subJson = jsonNode.get(parameterName).toString();
 				try {
-					final Object param = objectMapper.readValue(subJson, javaType);
+					final Object param = this.objectMapper.readValue(subJson, javaType);
 					params[i] = param;
 				} catch (IOException e) {
 					final String message =
@@ -119,7 +121,6 @@ public class StoreOperationController {
 	}
 
 	private JavaType[] resolveMethodParameterJavaTypes(Method actualMethod) {
-		final ObjectMapper objectMapper = new ObjectMapper();
 		final Class<?>[] parameterTypes = actualMethod.getParameterTypes();
 		final List<JavaType> javaTypes = new ArrayList<JavaType>(parameterTypes.length);
 		for (int i = 0; i < parameterTypes.length; i++) {
@@ -134,16 +135,16 @@ public class StoreOperationController {
 				final Class<?> genericClass = resolvableType.getGeneric(0).resolve();
 				if (genericClass == null) {
 					// if couldn't resolve generic type, fallback to parameter type
-					type = objectMapper.constructType(parameterType);
+					type = this.objectMapper.constructType(parameterType);
 				} else {
 					if (isList) {
-						type = objectMapper.getTypeFactory().constructCollectionType(List.class, genericClass);
+						type = this.objectMapper.getTypeFactory().constructCollectionType(List.class, genericClass);
 					} else {
-						type = objectMapper.getTypeFactory().constructCollectionType(Set.class, genericClass);
+						type = this.objectMapper.getTypeFactory().constructCollectionType(Set.class, genericClass);
 					}
 				}
 			} else {
-				type = objectMapper.constructType(parameterType);
+				type = this.objectMapper.constructType(parameterType);
 			}
 
 			javaTypes.add(type);
