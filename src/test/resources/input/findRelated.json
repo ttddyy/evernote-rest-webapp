@@ -1,0 +1,24 @@
+{
+    "query":{
+        "noteGuid":"RELATED_QUERY_NOTE_GUID",
+        "plainText":"RELATED_QUERY_PLAIN_TEXT",
+        "filter":{
+            "order":20,
+            "ascending":true,
+            "words":"NOTE_FILTER_WORDS",
+            "notebookGuid":"NOTE_FILTER_NOTEBOOK_GUID",
+            "tagGuids":["NOTE_FILTER_TAG_1", "NOTE_FILTER_TAG_2"],
+            "timeZone":"NOTE_FILTER_TIMEZONE",
+            "inactive":true,
+            "emphasized":"NOTE_FILTER_EMPHASIZED"
+        },
+        "referenceUri":"RELATED_QUERY_REFERENCE_URI"
+    },
+    "resultSpec":{
+        "maxNotes":1,
+        "maxNotebooks":2,
+        "maxTags":3,
+        "writableNotebooksOnly":true,
+        "includeContainingNotebooks":true
+    }
+}

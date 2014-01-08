@@ -1,0 +1,20 @@
+{
+    "sharedNotebook":{
+        "id":1001,
+        "userId":1002,
+        "notebookGuid":"SHARED_NOTEBOOK_1_GUID",
+        "email":"SHARED_NOTEBOOK_1_EMAIL",
+        "notebookModifiable":true,
+        "requireLogin":true,
+        "serviceCreated":1003,
+        "serviceUpdated":1004,
+        "shareKey":"SHARED_NOTEBOOK_1_SHARE_KEY",
+        "username":"SHARED_NOTEBOOK_1_USERNAME",
+        "privilege":"FULL_ACCESS",
+        "allowPreview":true,
+        "recipientSettings":{
+            "reminderNotifyEmail":true,
+            "reminderNotifyInApp":true
+        }
+    }
+}

@@ -1,0 +1,14 @@
+{
+    "search":{
+        "guid":"SAVEDSEARCH_GUID",
+        "name":"SAVEDSEARCH_NAME",
+        "query":"SAVEDSEARCH_QUERY",
+        "format":"USER",
+        "updateSequenceNum":200,
+        "scope":{
+            "includeAccount":true,
+            "includePersonalLinkedNotebooks":true,
+            "includeBusinessLinkedNotebooks":true
+        }
+    }
+}

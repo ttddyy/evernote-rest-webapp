@@ -1,0 +1,8 @@
+{
+    "tag":{
+        "guid":"TAG_GUID",
+        "name":"TAG_NAME",
+        "parentGuid":"TAG_PARENT_GUID",
+        "updateSequenceNum":500
+    }
+}

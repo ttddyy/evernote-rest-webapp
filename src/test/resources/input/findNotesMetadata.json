@@ -1,0 +1,27 @@
+{
+    "filter":{
+        "order":20,
+        "ascending":true,
+        "words":"NOTE_FILTER_WORDS",
+        "notebookGuid":"NOTE_FILTER_NOTEBOOK_GUID",
+        "tagGuids":["NOTE_FILTER_TAG_1", "NOTE_FILTER_TAG_2"],
+        "timeZone":"NOTE_FILTER_TIMEZONE",
+        "inactive":true,
+        "emphasized":"NOTE_FILTER_EMPHASIZED"
+    },
+    "offset":10,
+    "maxNotes":20,
+    "resultSpec":{
+        "includeTitle":true,
+        "includeContentLength":true,
+        "includeCreated":true,
+        "includeUpdated":true,
+        "includeDeleted":true,
+        "includeUpdateSequenceNum":true,
+        "includeNotebookGuid":true,
+        "includeTagGuids":true,
+        "includeAttributes":true,
+        "includeLargestResourceMime":true,
+        "includeLargestResourceSize":true
+    }
+}

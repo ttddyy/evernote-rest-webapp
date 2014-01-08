@@ -1,0 +1,47 @@
+{
+    "resource":{
+        "guid":"RESOURCE_GUID",
+        "noteGuid":"RESOURCE_NOTE_GUID",
+        "data":{
+            "bodyHash":"Rk9P",
+            "size":20,
+            "body":"QkFS"
+        },
+        "mime":"RESOURCE_MIME",
+        "width":10,
+        "height":20,
+        "duration":30,
+        "active":true,
+        "recognition":{
+            "bodyHash":"Rk9P",
+            "size":20,
+            "body":"QkFS"
+        },
+        "attributes":{
+            "sourceURL":"RESOURCE_ATTR_SOURCE_URL",
+            "timestamp":100,
+            "latitude":200,
+            "longitude":300,
+            "altitude":400,
+            "cameraMake":"RESOURCE_ATTR_CAMERA_MAKE",
+            "cameraModel":"RESOURCE_ATTR_CAMERA_MODEL",
+            "clientWillIndex":true,
+            "recoType":"RESOURCE_ATTR_RECO_TYPE",
+            "fileName":"RESOURCE_ATTR_FILE_NAME",
+            "attachment":true,
+            "applicationData":{
+                "keysOnly":["KEYS_ONLY_FOO", "KEYS_ONLY_BAR"],
+                "fullMap":{
+                    "FULLMAP_FOO_KEY":"FULLMAP_FOO_VALUE",
+                    "FULLMAP_BAR_KEY":"FULLMAP_BAR_VALUE"
+                }
+            }
+        },
+        "updateSequenceNum":40,
+        "alternateData":{
+            "bodyHash":"Rk9P",
+            "size":20,
+            "body":"QkFS"
+        }
+    }
+}

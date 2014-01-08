@@ -1,0 +1,18 @@
+{
+    "linkedNotebook":{
+        "shareName":"SHARE_NAME",
+        "username":"USERNAME",
+        "shardId":"SHARD_ID",
+        "shareKey":"SHARE_KEY",
+        "uri":"URI",
+        "guid":"GUID",
+        "updateSequenceNum":100,
+        "noteStoreUrl":"NOTE_STORE_URL",
+        "webApiUrlPrefix":"WEB_API_URL_PREFIX",
+        "stack":"STACK",
+        "businessId":200
+    },
+    "afterUSN":10,
+    "maxEntries":20,
+    "fullSyncOnly":true
+}
