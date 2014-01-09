@@ -46,3 +46,12 @@ $ curl -X POST
 # Documentation
 
 - [Evernote REST Webapp Reference](https://github.com/ttddyy/evernote-rest-webapp/wiki/Reference)
+
+
+# Development
+
+## Continuous Integration
+
+- [BuildHive Jenkins](https://buildhive.cloudbees.com/job/ttddyy/job/evernote-rest-webapp/)
+[![Build Status](https://buildhive.cloudbees.com/job/ttddyy/job/evernote-rest-webapp/badge/icon)](https://buildhive.cloudbees.com/job/ttddyy/job/evernote-rest-webapp/)
+
