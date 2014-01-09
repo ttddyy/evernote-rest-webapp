@@ -1,18 +1,14 @@
 package net.ttddyy.evernote.rest;
 
-import com.evernote.edam.notestore.NotesMetadataResultSpec;
-import com.evernote.edam.notestore.RelatedQuery;
-import com.evernote.edam.notestore.RelatedResultSpec;
-import com.evernote.edam.type.LazyMap;
+import com.evernote.edam.notestore.*;
 import com.evernote.edam.type.Notebook;
-import com.evernote.edam.type.Resource;
-import com.evernote.edam.type.ResourceAttributes;
+import com.evernote.edam.type.SharedNotebookRecipientSettings;
 import org.junit.Test;
 import org.springframework.util.FileCopyUtils;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.*;
+import java.util.Arrays;
 
 import static net.ttddyy.evernote.rest.TestDomainUtils.*;
 import static org.mockito.Mockito.verify;
@@ -30,14 +26,41 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 		verify(noteStoreOperations).getSyncState();
 	}
 
-	// TODO: getSyncStateWithMetrics(ClientUsageMetrics clientMetrics)
+	@Test
+	public void testGetSyncStateWithMetrics() throws Exception {
+		performRequest("/noteStore/getSyncStateWithMetrics", "{\"clientMetrics\": { \"sessions\":50 } }");
+		ClientUsageMetrics clientMetrics = new ClientUsageMetrics();
+		clientMetrics.setSessions(50);
+		verify(noteStoreOperations).getSyncStateWithMetrics(clientMetrics);
+	}
+
 	@Test
 	public void testGetSyncChunk() throws Exception {
 		performRequest("/noteStore/getSyncChunk", "{\"afterUSN\":100, \"maxEntries\":200, \"fullSyncOnly\":true}");
 		verify(noteStoreOperations).getSyncChunk(100, 200, true);
 	}
 
-	// TODO: getFilteredSyncChunk(int afterUSN, int maxEntries, SyncChunkFilter filter)
+	@Test
+	public void testGetFilteredSyncChunk() throws Exception {
+		String json = readJson("getFilteredSyncChunk.json");
+		performRequest("/noteStore/getFilteredSyncChunk", json);
+		SyncChunkFilter filter = new SyncChunkFilter();
+		filter.setIncludeNotes(true);
+		filter.setIncludeNoteResources(true);
+		filter.setIncludeNoteAttributes(true);
+		filter.setIncludeNotebooks(true);
+		filter.setIncludeTags(true);
+		filter.setIncludeSearches(true);
+		filter.setIncludeResources(true);
+		filter.setIncludeLinkedNotebooks(true);
+		filter.setIncludeExpunged(true);
+		filter.setIncludeNoteApplicationDataFullMap(true);
+		filter.setIncludeResourceApplicationDataFullMap(true);
+		filter.setIncludeNoteResourceApplicationDataFullMap(true);
+		filter.setRequireNoteContentClass("FILTER_NOTE_CONTENT_CLASS");
+		verify(noteStoreOperations).getFilteredSyncChunk(30, 40, filter);
+	}
+
 	@Test
 	public void testGetLinkedNotebookSyncState() throws Exception {
 		String json = readJson("linkedNotebook.json");
@@ -212,8 +235,15 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 
 	@Test
 	public void testGetNote() throws Exception {
-		String json = "{\"guid\":\"GUID\", \"withContent\":true, \"withResourcesData\":true, \"withResourcesRecognition\":true, \"withResourcesAlternateData\":true}";
-		performRequest("/noteStore/getNote", json);
+		StringBuilder sb = new StringBuilder();
+		sb.append("{                                        ");
+		sb.append("    \"guid\":\"GUID\",                   ");
+		sb.append("    \"withContent\":true,                ");
+		sb.append("    \"withResourcesData\":true,          ");
+		sb.append("    \"withResourcesRecognition\":true,   ");
+		sb.append("    \"withResourcesAlternateData\":true  ");
+		sb.append("}                                        ");
+		performRequest("/noteStore/getNote", sb.toString());
 		verify(noteStoreOperations).getNote("GUID", true, true, true, true);
 	}
 
@@ -267,8 +297,20 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 		verify(noteStoreOperations).getNoteTagNames("GUID_FOO");
 	}
 
-	// TODO: createNote(Note note)
-	// TODO: updateNote(Note note)
+	@Test
+	public void testCreateNote() throws Exception {
+		String json = readJson("note.json");
+		performRequest("/noteStore/createNote", json);
+		verify(noteStoreOperations).createNote(getNote());
+	}
+
+	@Test
+	public void testUpdateNote() throws Exception {
+		String json = readJson("note.json");
+		performRequest("/noteStore/updateNote", json);
+		verify(noteStoreOperations).updateNote(getNote());
+	}
+
 	@Test
 	public void testDeleteNote() throws Exception {
 		performRequest("/noteStore/deleteNote", "{\"guid\":\"GUID_FOO\"}");
@@ -307,15 +349,29 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 
 	@Test
 	public void testGetNoteVersion() throws Exception {
-		String json = "{\"noteGuid\":\"NOTE_GUID\", \"updateSequenceNum\":100, \"withResourcesData\":true, \"withResourcesRecognition\":true, \"withResourcesAlternateData\":true}";
-		performRequest("/noteStore/getNoteVersion", json);
+		StringBuilder sb = new StringBuilder();
+		sb.append("{                                        ");
+		sb.append("    \"noteGuid\":\"NOTE_GUID\",          ");
+		sb.append("    \"updateSequenceNum\":100,           ");
+		sb.append("    \"withResourcesData\":true,          ");
+		sb.append("    \"withResourcesRecognition\":true,   ");
+		sb.append("    \"withResourcesAlternateData\":true  ");
+		sb.append("}                                        ");
+		performRequest("/noteStore/getNoteVersion", sb.toString());
 		verify(noteStoreOperations).getNoteVersion("NOTE_GUID", 100, true, true, true);
 	}
 
 	@Test
 	public void testGetResource() throws Exception {
-		String json = "{\"guid\":\"GUID\", \"withData\":true, \"withRecognition\":true, \"withAttributes\":true, \"withAlternateData\":true}";
-		performRequest("/noteStore/getResource", json);
+		StringBuilder sb = new StringBuilder();
+		sb.append("{                              ");
+		sb.append("    \"guid\":\"GUID\",         ");
+		sb.append("    \"withData\":true,         ");
+		sb.append("    \"withRecognition\":true,  ");
+		sb.append("    \"withAttributes\":true,   ");
+		sb.append("    \"withAlternateData\":true ");
+		sb.append("}                              ");
+		performRequest("/noteStore/getResource", sb.toString());
 		verify(noteStoreOperations).getResource("GUID", true, true, true, true);
 	}
 
@@ -348,47 +404,7 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 	public void testUpdateResource() throws Exception {
 		String json = readJson("updateResource.json");
 		performRequest("/noteStore/updateResource", json);
-
-		Set<String> keysOnly = new HashSet<String>();
-		keysOnly.add("KEYS_ONLY_FOO");
-		keysOnly.add("KEYS_ONLY_BAR");
-
-		Map<String, String> fullMap = new HashMap<String, String>();
-		fullMap.put("FULLMAP_FOO_KEY", "FULLMAP_FOO_VALUE");
-		fullMap.put("FULLMAP_BAR_KEY", "FULLMAP_BAR_VALUE");
-
-		LazyMap lazyMap = new LazyMap();
-		lazyMap.setKeysOnly(keysOnly);
-		lazyMap.setFullMap(fullMap);
-
-		ResourceAttributes resourceAttributes = new ResourceAttributes();
-		resourceAttributes.setSourceURL("RESOURCE_ATTR_SOURCE_URL");
-		resourceAttributes.setTimestamp(100);
-		resourceAttributes.setLatitude(200);
-		resourceAttributes.setLongitude(300);
-		resourceAttributes.setAltitude(400);
-		resourceAttributes.setCameraMake("RESOURCE_ATTR_CAMERA_MAKE");
-		resourceAttributes.setCameraModel("RESOURCE_ATTR_CAMERA_MODEL");
-		resourceAttributes.setClientWillIndex(true);
-		resourceAttributes.setRecoType("RESOURCE_ATTR_RECO_TYPE");
-		resourceAttributes.setFileName("RESOURCE_ATTR_FILE_NAME");
-		resourceAttributes.setAttachment(true);
-		resourceAttributes.setApplicationData(lazyMap);
-
-		Resource resource = new Resource();
-		resource.setGuid("RESOURCE_GUID");
-		resource.setNoteGuid("RESOURCE_NOTE_GUID");
-		resource.setData(getData());
-		resource.setMime("RESOURCE_MIME");
-		resource.setWidth((short) 10);
-		resource.setHeight((short) 20);
-		resource.setDuration((short) 30);
-		resource.setActive(true);
-		resource.setRecognition(getData());
-		resource.setAttributes(resourceAttributes);
-		resource.setUpdateSequenceNum(40);
-		resource.setAlternateData(getData());
-		verify(noteStoreOperations).updateResource(resource);
+		verify(noteStoreOperations).updateResource(getResource());
 	}
 
 	@Test
@@ -397,7 +413,20 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 		verify(noteStoreOperations).getResourceData("GUID_FOO");
 	}
 
-	// TODO: getResourceByHash(String noteGuid, byte[] contentHash, boolean withData, boolean withRecognition, boolean withAlternateData)
+	@Test
+	public void testGetResourceByHash() throws Exception {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{                               ");
+		sb.append("    \"noteGuid\": \"GUID\",     ");
+		sb.append("    \"contentHash\": \"Rk9P\",  ");  // base64 encoded value of "FOO" => 70,79,79 in byte
+		sb.append("    \"withData\": true,         ");
+		sb.append("    \"withRecognition\": true,  ");
+		sb.append("    \"withAlternateData\": true ");
+		sb.append("}                               ");
+		performRequest("/noteStore/getResourceByHash", sb.toString());
+		verify(noteStoreOperations).getResourceByHash("GUID", getByteFoo(), true, true, true);
+	}
+
 	@Test
 	public void testGetResourceRecognition() throws Exception {
 		performRequest("/noteStore/getResourceRecognition", "{\"guid\":\"GUID_FOO\"}");
@@ -436,7 +465,20 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 		verify(noteStoreOperations).updateSharedNotebook(getSharedNotebook1());
 	}
 
-	// TODO: sendMessageToSharedNotebookMembers(String notebookGuid, String messageText, List<String> recipients)
+	@Test
+	public void testSendMessageToSharedNotebookMembers() throws Exception {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{                                 ");
+		sb.append("    \"notebookGuid\": \"GUID\",   ");
+		sb.append("    \"messageText\": \"MESSAGE\", ");
+		sb.append("    \"recipients\": [             ");
+		sb.append("         \"FOO\", \"BAR\"         ");
+		sb.append("    ]                             ");
+		sb.append("}                                 ");
+		performRequest("/noteStore/sendMessageToSharedNotebookMembers", sb.toString());
+		verify(noteStoreOperations).sendMessageToSharedNotebookMembers("GUID", "MESSAGE", Arrays.asList("FOO", "BAR"));
+	}
+
 	@Test
 	public void testListSharedNotebooks() throws Exception {
 		performRequest("/noteStore/listSharedNotebooks", "{}");
@@ -487,7 +529,21 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 		verify(noteStoreOperations).getSharedNotebookByAuth();
 	}
 
-	// TODO: emailNote(NoteEmailParameters parameters)
+	@Test
+	public void testEmailNote() throws Exception {
+		String json = readJson("emailNote.json");
+		performRequest("/noteStore/emailNote", json);
+
+		NoteEmailParameters parameters = new NoteEmailParameters();
+		parameters.setGuid("NOTE_EMAIL_PARAM_GUID");
+		parameters.setNote(getNote());
+		parameters.setToAddresses(Arrays.asList("NOTE_EMAIL_PARAM_TO_ADDR_FOO", "NOTE_EMAIL_PARAM_TO_ADDR_BAR"));
+		parameters.setCcAddresses(Arrays.asList("NOTE_EMAIL_PARAM_CC_ADDR_FOO", "NOTE_EMAIL_PARAM_CC_ADDR_BAR"));
+		parameters.setSubject("NOTE_EMAIL_PARAM_SUBJECT");
+		parameters.setMessage("NOTE_EMAIL_PARAM_MESSAGE");
+		verify(noteStoreOperations).emailNote(parameters);
+	}
+
 	@Test
 	public void testShareNote() throws Exception {
 		performRequest("/noteStore/shareNote", "{\"guid\":\"GUID_FOO\"}");
@@ -526,7 +582,24 @@ public class StoreOperationControllerNoteStoreIntegrationTest extends AbstractSt
 		resultSpec.setIncludeContainingNotebooks(true);
 		verify(noteStoreOperations).findRelated(query, resultSpec);
 	}
-	// TODO: setSharedNotebookRecipientSettings( final String authenticationToken, final long sharedNotebookId, final SharedNotebookRecipientSettings recipientSettings)
+
+	@Test
+	public void testSetSharedNotebookRecipientSettings() throws Exception {
+		StringBuilder sb = new StringBuilder();
+		sb.append("{                                        ");
+		sb.append("    \"authenticationToken\": \"TOKEN\",  ");
+		sb.append("    \"sharedNotebookId\": 111,           ");
+		sb.append("    \"recipientSettings\": {             ");
+		sb.append("       \"reminderNotifyEmail\": true,    ");
+		sb.append("       \"reminderNotifyInApp\": true     ");
+		sb.append("    }                                    ");
+		sb.append("}                                        ");
+		performRequest("/noteStore/setSharedNotebookRecipientSettings", sb.toString());
+		SharedNotebookRecipientSettings recipientSettings = new SharedNotebookRecipientSettings();
+		recipientSettings.setReminderNotifyEmail(true);
+		recipientSettings.setReminderNotifyInApp(true);
+		verify(noteStoreOperations).setSharedNotebookRecipientSettings("TOKEN", 111, recipientSettings);
+	}
 
 
 	private String readJson(String filename) throws IOException {

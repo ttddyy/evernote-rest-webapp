@@ -3,9 +3,7 @@ package net.ttddyy.evernote.rest;
 import com.evernote.edam.notestore.NoteFilter;
 import com.evernote.edam.type.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * Utility class to create domain objects for test.
@@ -70,9 +68,9 @@ public class TestDomainUtils {
 
 	public static Data getData() {
 		Data data = new Data();
-		data.setBodyHash(new byte[]{70, 79, 79});  // "FOO", base64 encoded value is "Rk9P"
+		data.setBodyHash(getByteFoo());  // "FOO", base64 encoded value is "Rk9P"
 		data.setSize(20);
-		data.setBody(new byte[]{66, 65, 82});  // "BAR", base64 encoded value is "QkFS"
+		data.setBody(getByteBAR());  // "BAR", base64 encoded value is "QkFS"
 		return data;
 	}
 
@@ -271,4 +269,112 @@ public class TestDomainUtils {
 		return notebook;
 	}
 
+
+	public static Resource getResource() {
+		Set<String> keysOnly = new HashSet<String>();
+		keysOnly.add("KEYS_ONLY_FOO");
+		keysOnly.add("KEYS_ONLY_BAR");
+
+		Map<String, String> fullMap = new HashMap<String, String>();
+		fullMap.put("FULLMAP_FOO_KEY", "FULLMAP_FOO_VALUE");
+		fullMap.put("FULLMAP_BAR_KEY", "FULLMAP_BAR_VALUE");
+
+		LazyMap lazyMap = new LazyMap();
+		lazyMap.setKeysOnly(keysOnly);
+		lazyMap.setFullMap(fullMap);
+
+		ResourceAttributes resourceAttributes = new ResourceAttributes();
+		resourceAttributes.setSourceURL("RESOURCE_ATTR_SOURCE_URL");
+		resourceAttributes.setTimestamp(100);
+		resourceAttributes.setLatitude(200);
+		resourceAttributes.setLongitude(300);
+		resourceAttributes.setAltitude(400);
+		resourceAttributes.setCameraMake("RESOURCE_ATTR_CAMERA_MAKE");
+		resourceAttributes.setCameraModel("RESOURCE_ATTR_CAMERA_MODEL");
+		resourceAttributes.setClientWillIndex(true);
+		resourceAttributes.setRecoType("RESOURCE_ATTR_RECO_TYPE");
+		resourceAttributes.setFileName("RESOURCE_ATTR_FILE_NAME");
+		resourceAttributes.setAttachment(true);
+		resourceAttributes.setApplicationData(lazyMap);
+
+		Resource resource = new Resource();
+		resource.setGuid("RESOURCE_GUID");
+		resource.setNoteGuid("RESOURCE_NOTE_GUID");
+		resource.setData(getData());
+		resource.setMime("RESOURCE_MIME");
+		resource.setWidth((short) 10);
+		resource.setHeight((short) 20);
+		resource.setDuration((short) 30);
+		resource.setActive(true);
+		resource.setRecognition(getData());
+		resource.setAttributes(resourceAttributes);
+		resource.setUpdateSequenceNum(40);
+		resource.setAlternateData(getData());
+		return resource;
+	}
+
+	public static Note getNote() {
+		Set<String> keysOnly = new HashSet<String>();
+		keysOnly.add("KEYS_ONLY_FOO");
+		keysOnly.add("KEYS_ONLY_BAR");
+
+		Map<String, String> fullMap = new HashMap<String, String>();
+		fullMap.put("FULLMAP_FOO_KEY", "FULLMAP_FOO_VALUE");
+		fullMap.put("FULLMAP_BAR_KEY", "FULLMAP_BAR_VALUE");
+
+		LazyMap applicationData = new LazyMap();
+		applicationData.setKeysOnly(keysOnly);
+		applicationData.setFullMap(fullMap);
+
+		Map<String, String> classifications = new HashMap<String, String>();
+		classifications.put("CLASSIFICATION_FOO_KEY", "CLASSIFICATION_FOO_VALUE");
+		classifications.put("CLASSIFICATION_BAR_KEY", "CLASSIFICATION_BAR_VALUE");
+
+		NoteAttributes attributes = new NoteAttributes();
+		attributes.setSubjectDate(30);
+		attributes.setLatitude(31);
+		attributes.setLongitude(32);
+		attributes.setAltitude(33);
+		attributes.setAuthor("NOTE_ATTRIBUTE_AUTHOR");
+		attributes.setSource("NOTE_ATTRIBUTE_SOURCE");
+		attributes.setSourceURL("NOTE_ATTRIBUTE_URL");
+		attributes.setSourceApplication("NOTE_ATTRIBUTE_SOURCE_APPLICATION");
+		attributes.setShareDate(34);
+		attributes.setReminderOrder(35);
+		attributes.setReminderDoneTime(36);
+		attributes.setReminderTime(37);
+		attributes.setPlaceName("NOTE_ATTRIBUTE_PLACE_NAME");
+		attributes.setContentClass("NOTE_ATTRIBUTE_CONTENT_CLASS");
+		attributes.setApplicationData(applicationData);
+		attributes.setLastEditedBy("NOTE_ATTRIBUTE_LAST_EDITED_BY");
+		attributes.setClassifications(classifications);
+		attributes.setCreatorId(38);
+		attributes.setLastEditorId(39);
+
+		Note note = new Note();
+		note.setGuid("NOTE_GUID");
+		note.setTitle("NOTE_TITLE");
+		note.setContent("NOTE_CONTENT");
+		note.setContentHash(getByteFoo());
+		note.setContentLength(10);
+		note.setCreated(11);
+		note.setUpdated(12);
+		note.setDeleted(13);
+		note.setActive(true);
+		note.setUpdateSequenceNum(14);
+		note.setNotebookGuid("NOTEBOOK_GUID");
+		note.setTagGuids(Arrays.asList("TAG_GUID_FOO", "TAG_GUID_BAR"));
+		note.setResources(Arrays.asList(getResource(), getResource()));
+		note.setAttributes(attributes);
+		note.setTagNames(Arrays.asList("NOTE_TAG_FOO", "NOTE_TAG_BAR"));
+		return note;
+	}
+
+	public static byte[] getByteFoo() {
+		return new byte[]{70, 79, 79};  // "FOO" as byte. base64 encoded value is "Rk9P"
+	}
+
+	public static byte[] getByteBAR() {
+		return new byte[]{66, 65, 82};  // "BAR" as byte. "BAR", base64 encoded value is "QkFS"
+	}
 }

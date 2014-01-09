@@ -1,0 +1,19 @@
+{
+    "afterUSN":30,
+    "maxEntries":40,
+    "filter":{
+        "includeNotes":true,
+        "includeNoteResources":true,
+        "includeNoteAttributes":true,
+        "includeNotebooks":true,
+        "includeTags":true,
+        "includeSearches":true,
+        "includeResources":true,
+        "includeLinkedNotebooks":true,
+        "includeExpunged":true,
+        "includeNoteApplicationDataFullMap":true,
+        "includeResourceApplicationDataFullMap":true,
+        "includeNoteResourceApplicationDataFullMap":true,
+        "requireNoteContentClass":"FILTER_NOTE_CONTENT_CLASS"
+    }
+}
