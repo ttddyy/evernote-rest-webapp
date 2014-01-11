@@ -16,6 +16,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.validation.constraints.NotNull;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Evernote Rest Webapp application and configuration.
@@ -45,6 +47,7 @@ public class Application {
 		public boolean alwaysUseTokenFromConfig;
 		public boolean fallbackToTokenFromConfig;
 		public EvernoteService environment = EvernoteService.SANDBOX;  // default is sandbox
+		public Map<String, String> customHeaders = new HashMap<String, String>();
 
 		public void setEnvironment(EvernoteService environment) {
 			this.environment = environment;
@@ -68,6 +71,15 @@ public class Application {
 
 		public void setFallbackToTokenFromConfig(boolean fallbackToTokenFromConfig) {
 			this.fallbackToTokenFromConfig = fallbackToTokenFromConfig;
+		}
+
+		public void setCustomHeaders(Map<String, String> customHeaders) {
+			this.customHeaders = customHeaders;
+		}
+
+		// getter is required for map to bind property values
+		public Map<String, String> getCustomHeaders() {
+			return customHeaders;
 		}
 	}
 
@@ -108,6 +120,12 @@ public class Application {
 
 		// for this rest app, do not create proxy for thrift object
 		evernote.setApplyNullSafe(false);
+
+		final Map<String, String> customHeaders = config.getCustomHeaders();
+		if (!customHeaders.isEmpty()) {
+			evernote.clientFactory().setCustomHeaders(customHeaders);
+		}
+
 
 		return evernote;
 	}

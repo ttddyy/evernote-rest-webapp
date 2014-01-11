@@ -8,6 +8,9 @@ import org.springframework.social.evernote.api.Evernote;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.context.request.WebRequest;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -116,6 +119,34 @@ public class ApplicationConfigEvernoteBeanTest {
 		EvernoteAuth evernoteAuth = retrieveEvernoteAuth(clientFactory);
 		assertThat(evernoteAuth, is(notNullValue()));
 		assertThat(evernoteAuth.getToken(), is("ACCESS_TOKEN_FROM_CONFIG"));
+
+	}
+
+	@Test
+	public void testCustomHeaders() {
+
+		Map<String, String> headers = new HashMap<String, String>();
+		headers.put("foo", "FOO");
+		headers.put("bar", "BAR");
+		Application.EvernotePropertiesConfiguration config = new Application.EvernotePropertiesConfiguration();
+		config.setCustomHeaders(headers);
+
+		Application application = new Application();
+		application.evernotePropertiesConfiguration = config;
+
+		WebRequest request = mock(WebRequest.class);
+		when(request.getHeader("evernote-rest-accesstoken")).thenReturn("ACCESS_TOKEN");
+		Evernote evernote = application.evernote(request);
+		assertThat(evernote, is(notNullValue()));
+
+		ClientFactory clientFactory = evernote.clientFactory();
+		assertThat(clientFactory, is(notNullValue()));
+
+		Map<String, String> customHeaders = (Map<String, String>) ReflectionTestUtils.getField(clientFactory, "customHeaders");
+		assertThat(customHeaders, is(notNullValue()));
+		assertThat(customHeaders.size(), is(2));
+		assertThat(customHeaders, hasEntry("bar", "BAR"));
+		assertThat(customHeaders, hasEntry("bar", "BAR"));
 
 	}
 
