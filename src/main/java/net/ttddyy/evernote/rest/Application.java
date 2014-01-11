@@ -47,6 +47,7 @@ public class Application {
 		public boolean alwaysUseTokenFromConfig;
 		public boolean fallbackToTokenFromConfig;
 		public EvernoteService environment = EvernoteService.SANDBOX;  // default is sandbox
+		public String userAgent;
 		public Map<String, String> customHeaders = new HashMap<String, String>();
 
 		public void setEnvironment(EvernoteService environment) {
@@ -71,6 +72,10 @@ public class Application {
 
 		public void setFallbackToTokenFromConfig(boolean fallbackToTokenFromConfig) {
 			this.fallbackToTokenFromConfig = fallbackToTokenFromConfig;
+		}
+
+		public void setUserAgent(String userAgent) {
+			this.userAgent = userAgent;
 		}
 
 		public void setCustomHeaders(Map<String, String> customHeaders) {
@@ -120,6 +125,10 @@ public class Application {
 
 		// for this rest app, do not create proxy for thrift object
 		evernote.setApplyNullSafe(false);
+
+		if (config.userAgent != null) {
+			evernote.clientFactory().setUserAgent(config.userAgent);
+		}
 
 		final Map<String, String> customHeaders = config.getCustomHeaders();
 		if (!customHeaders.isEmpty()) {

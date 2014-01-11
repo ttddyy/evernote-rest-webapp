@@ -123,6 +123,28 @@ public class ApplicationConfigEvernoteBeanTest {
 	}
 
 	@Test
+	public void testUserAgent() {
+
+		Application.EvernotePropertiesConfiguration config = new Application.EvernotePropertiesConfiguration();
+		config.setUserAgent("USER_AGENT");
+
+		Application application = new Application();
+		application.evernotePropertiesConfiguration = config;
+
+		WebRequest request = mock(WebRequest.class);
+		when(request.getHeader("evernote-rest-accesstoken")).thenReturn("ACCESS_TOKEN");
+		Evernote evernote = application.evernote(request);
+		assertThat(evernote, is(notNullValue()));
+
+		ClientFactory clientFactory = evernote.clientFactory();
+		assertThat(clientFactory, is(notNullValue()));
+
+		String userAgent = (String) ReflectionTestUtils.getField(clientFactory, "userAgent");
+		assertThat(userAgent, is("USER_AGENT"));
+
+	}
+
+	@Test
 	public void testCustomHeaders() {
 
 		Map<String, String> headers = new HashMap<String, String>();
