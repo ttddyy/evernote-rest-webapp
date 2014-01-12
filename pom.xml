@@ -9,6 +9,7 @@
 
     <name>evernote-rest-webapp</name>
     <url>http://maven.apache.org</url>
+    <description>Provide REST API for evernote.</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
