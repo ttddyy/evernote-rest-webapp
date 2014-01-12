@@ -35,7 +35,7 @@ Response:
 
 ```shell
 $ curl -X POST
-   -H "evernote-rest-accesstoken: ..."
+   -H "evernote-rest-accesstoken: ..." -H "Content-Type: application/json"
    -d '{"clientName": "foo", "edamVersionMajor": 10, "edamVersionMinor": 20}'
    http://localhost:8080/userStore/checkVersion
 ```
@@ -43,9 +43,28 @@ $ curl -X POST
 ---
 ### NoteStore operations
 
+```shell
+$ curl -X POST
+   -H "evernote-rest-accesstoken: ..." -H "Content-Type: application/json"
+   -d '{
+          "filter":{
+              "order": 2,
+              "ascending": true,
+              "words": "[NOTE_FILTER_WORDS]",
+              "notebookGuid": "[NOTEBOOK_GUID]",
+              "tagGuids": ["TAG_GUID1", "TAG_GUID2"],
+              "timeZone": "",
+              "inactive": true
+          },
+          "offset": 2,
+          "maxNotes": 30
+      }'
+   http://localhost:8080/noteStore/findNotes
+```
+
 # Documentation
 
-- [Evernote REST Webapp Reference](https://github.com/ttddyy/evernote-rest-webapp/wiki/Reference)
+- [Evernote REST Webapp Reference](https://github.com/ttddyy/evernote-rest-webapp/wiki)
 
 
 # Development
