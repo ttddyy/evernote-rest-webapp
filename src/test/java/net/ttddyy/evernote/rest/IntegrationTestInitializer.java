@@ -13,12 +13,12 @@ import org.springframework.core.env.ConfigurableEnvironment;
 public class IntegrationTestInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 	@Override
 	public void initialize(ConfigurableApplicationContext applicationContext) {
-		ConfigurableEnvironment environment = applicationContext.getEnvironment();
-		EnvironmentTestUtils.addEnviroment(environment, "evernote.consumerKey:test_consumer_key");
-		EnvironmentTestUtils.addEnviroment(environment, "evernote.consumerSecret:test_consumer_secret");
-
+		String consumerKey = "evernote.consumerKey:test_consumer_key";
+		String consumerSecret = "evernote.consumerSecret:test_consumer_secret";
 		// disable jmx export for test to avoid InstanceAlreadyExistsException for multiple SpringBoot app contexts
-		EnvironmentTestUtils.addEnviroment(environment, "spring.jmx.enabled:false");
+		String disableJmx = "spring.jmx.enabled:false";
+
+		EnvironmentTestUtils.addEnvironment(applicationContext, consumerKey, consumerSecret, disableJmx);
 	}
 
 }
