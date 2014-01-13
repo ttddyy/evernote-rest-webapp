@@ -3,3 +3,4 @@ target/
 *.ipr
 *.iws
 .idea/
+src/main/resources/git.properties
