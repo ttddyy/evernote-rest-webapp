@@ -33,7 +33,8 @@ public class StoreOperationController {
 	private ObjectMapper objectMapper;
 
 	@RequestMapping(value = "/{methodName}", method = RequestMethod.POST)
-	public Object invoke(@PathVariable String storeName, @PathVariable String methodName, @RequestBody JsonNode jsonNode) {
+	public Object invoke(@PathVariable String storeName, @PathVariable String methodName,
+	                     @RequestBody(required = false) JsonNode jsonNode) {
 
 		final StoreOperations storeOperations = getStoreOperations(storeName);
 		final Class<?> storeOperationsClass = storeOperations.getClass();
@@ -45,8 +46,10 @@ public class StoreOperationController {
 			throw new EvernoteRestException(message);
 		}
 
-		final Object[] params = resolveParameters(storeOperations, method, jsonNode);
-		ReflectionUtils.makeAccessible(method);  // TODO: need this? since it uses interface, all methods are public...
+		Object[] params = null;
+		if (jsonNode != null) {
+			params = resolveParameters(storeOperations, method, jsonNode);
+		}
 		return ReflectionUtils.invokeMethod(method, storeOperations, params);
 	}
 
