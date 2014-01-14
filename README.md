@@ -1,9 +1,9 @@
 # Evernote REST Webapp
 
-*"Evernote REST Webapp"* provides restful APIs for evernote.
+"Evernote REST Webapp" provides restful APIs for evernote.
 
-The API covers evernote OAuth and all of thrift based operations. JSON is used for input and output parameters.
-*"Evernote REST Webapp"* is a java based web application that behaves like a proxy between evernote thrift
+The API covers evernote OAuth and all of thrift based operations. Input and output parameters are represented
+as JSON. "Evernote REST Webapp" is a java based web application that behaves like a proxy between evernote thrift
 servers and your applications.
 It is built on top of [Spring Boot](http://projects.spring.io/spring-boot/),
 [Sprnig Social Evernote](https://github.com/ttddyy/spring-social-evernote/), and
