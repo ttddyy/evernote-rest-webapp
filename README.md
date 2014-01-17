@@ -35,8 +35,7 @@ Response:
 ```json
 { "value":"…", "secret":"", "edamShard":"s…", "edamUserId":"...", "edamExpires":"...",
   "edamNoteStoreUrl":"https://...evernote.com/shard/...",
-  "edamWebApiUrlPrefix":"https://...evernote.com/shard/..."
-}
+  "edamWebApiUrlPrefix":"https://...evernote.com/shard/..." }
 ```
 
 ---
@@ -44,8 +43,8 @@ Response:
 ### UserStore operations
 
 ```shell
-$ curl -X POST
-   -H "evernote-rest-accesstoken: ..." -H "Content-Type: application/json"
+$ curl -X POST -H "Content-Type: application/json"
+   -H "evernote-rest-accesstoken: ..."
    -d '{"clientName": "foo", "edamVersionMajor": 10, "edamVersionMinor": 20}'
    http://localhost:8080/userStore/checkVersion
 ```
@@ -54,8 +53,8 @@ $ curl -X POST
 ### NoteStore operations
 
 ```shell
-$ curl -X POST
-   -H "evernote-rest-accesstoken: ..." -H "Content-Type: application/json"
+$ curl -X POST -H "Content-Type: application/json"
+   -H "evernote-rest-accesstoken: ..."
    -d '{
           "filter":{
               "order": 2,
@@ -78,6 +77,13 @@ $ curl -X POST
 - [Quick Start Guide](https://github.com/ttddyy/evernote-rest-webapp/wiki/QuickStart)
 
 # Development
+
+## library versions
+
+| evernote-rest-webapp |     spring-boot | spring-social-evernote | evernote-sdk-java |
+| --------------------:| ---------------:| ----------------------:| -----------------:|
+|             SNAPSHOT |  0.5.0-SNAPSHOT |                  1.0.1 |            1.25.1 |
+
 
 ## Continuous Integration
 
