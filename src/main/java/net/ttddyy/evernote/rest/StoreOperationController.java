@@ -39,25 +39,32 @@ public class StoreOperationController {
 
 		final StoreOperations storeOperations = getStoreOperations(storeName);
 		final Class<?> storeOperationsClass = storeOperations.getClass();
-		final Class<?> storeClientClass = resolveStoreClientClass(storeOperations);  // underlying actual ~StoreClient class.
+		final Class<?> actualStoreClientClass = resolveStoreClientClass(storeOperations);  // underlying ~StoreClient class.
 
 		// In ~StoreClient class, method names are currently unique. passing null to paramTypes arg means find method by name.
 		final Method method = ReflectionUtils.findMethod(storeOperationsClass, methodName, null);
-		if (method == null) {
-			final String message = String.format("Cannot find methodName=[%s] on [%s].", methodName, storeClientClass);
+		final Method actualMethod = ReflectionUtils.findMethod(actualStoreClientClass, methodName, null);
+		if (method == null || actualMethod == null) {
+			final String message = String.format("Cannot find methodName=[%s] on [%s].", methodName, actualStoreClientClass);
 			throw new EvernoteRestException(message);
 		}
 
 		Object[] params = null;
 		if (jsonNode != null) {
-			params = resolveParameters(storeOperations, method, jsonNode);
+			// Cannot retrieve parameter names and generic method parameter type from interface, even though classes
+			// are compiled with debugging information.
+			// ~StoreClient class, which is an underlying implementation class of ~StoreOperations, uses same parameter
+			// names and types. Thus, for now, use underlying actual ~StoreClient class to resolve names and types.
+			// Java8 with StandardReflectionParameterNameDiscoverer class, it may be possible to retrieve param names from
+			// interface. (haven't checked)
+			params = resolveParameters(actualMethod, jsonNode);
 		}
 
 		try {
 			return ReflectionUtils.invokeMethod(method, storeOperations, params);
 		} catch (Exception e) {
 			final String message = String.format("Failed to invoke method. method=[%s], storeClient=[%s], params=[%s]",
-					method.getName(), storeClientClass, ObjectUtils.nullSafeToString(params));
+					method.getName(), actualStoreClientClass, ObjectUtils.nullSafeToString(params));
 			throw new EvernoteRestException(message, e);
 		}
 	}
@@ -73,18 +80,10 @@ public class StoreOperationController {
 	/**
 	 * Based on received json, deserialize parameters.
 	 */
-	private Object[] resolveParameters(StoreOperations storeOperations, Method method, JsonNode jsonNode) {
-
-		final String methodName = method.getName();
-		// Cannot retrieve parameter names from interface, even though classes are compiled with debugging information.
-		// Since ~StoreClient class which is an underlying implementation class of ~StoreOperations uses same parameter
-		// names. So, use parameter names from ~StoreClient impl class for now.
-		// Java8 with StandardReflectionParameterNameDiscoverer class, it may be possible to retrieve param names from
-		// interface. (haven't checked)
-		final Method actualMethod = resolveActualMethod(storeOperations, methodName);
+	private Object[] resolveParameters(Method actualMethod, JsonNode jsonNode) {
 		final String[] parameterNames = resolveParameterNames(actualMethod);
 		if (parameterNames == null) {
-			final String message = String.format("Cannot find parameter names for method=[%s].", methodName);
+			final String message = String.format("Cannot find parameter names for method=[%s].", actualMethod.getName());
 			throw new EvernoteRestException(message);
 		}
 
@@ -92,11 +91,6 @@ public class StoreOperationController {
 		// object mapper requires JavaType to be provided. Otherwise, generics for number gets default to List<Integer>.
 		final JavaType[] parameterJavaTypes = resolveMethodParameterJavaTypes(actualMethod);
 		return resolveParameterValues(parameterNames, parameterJavaTypes, jsonNode);
-	}
-
-	private Method resolveActualMethod(StoreOperations storeOperations, String methodName) {
-		final Class<?> storeClientClass = resolveStoreClientClass(storeOperations);
-		return ReflectionUtils.findMethod(storeClientClass, methodName, null);  // find by name
 	}
 
 	private Class<?> resolveStoreClientClass(StoreOperations storeOperations) {
