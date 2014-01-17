@@ -10,6 +10,7 @@ import org.springframework.core.ResolvableType;
 import org.springframework.social.evernote.api.Evernote;
 import org.springframework.social.evernote.api.StoreClientHolder;
 import org.springframework.social.evernote.api.StoreOperations;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.bind.annotation.*;
 
@@ -38,11 +39,12 @@ public class StoreOperationController {
 
 		final StoreOperations storeOperations = getStoreOperations(storeName);
 		final Class<?> storeOperationsClass = storeOperations.getClass();
+		final Class<?> storeClientClass = resolveStoreClientClass(storeOperations);  // underlying actual ~StoreClient class.
 
 		// In ~StoreClient class, method names are currently unique. passing null to paramTypes arg means find method by name.
 		final Method method = ReflectionUtils.findMethod(storeOperationsClass, methodName, null);
 		if (method == null) {
-			final String message = String.format("Cannot find methodName=[%s] on [%s].", methodName, storeOperationsClass);
+			final String message = String.format("Cannot find methodName=[%s] on [%s].", methodName, storeClientClass);
 			throw new EvernoteRestException(message);
 		}
 
@@ -50,7 +52,14 @@ public class StoreOperationController {
 		if (jsonNode != null) {
 			params = resolveParameters(storeOperations, method, jsonNode);
 		}
-		return ReflectionUtils.invokeMethod(method, storeOperations, params);
+
+		try {
+			return ReflectionUtils.invokeMethod(method, storeOperations, params);
+		} catch (Exception e) {
+			final String message = String.format("Failed to invoke method. method=[%s], storeClient=[%s], params=[%s]",
+					method.getName(), storeClientClass, ObjectUtils.nullSafeToString(params));
+			throw new EvernoteRestException(message, e);
+		}
 	}
 
 	private StoreOperations getStoreOperations(String storeName) {
@@ -86,8 +95,12 @@ public class StoreOperationController {
 	}
 
 	private Method resolveActualMethod(StoreOperations storeOperations, String methodName) {
-		final Class<?> storeClientClass = ((StoreClientHolder) storeOperations).getStoreClient().getClass();
+		final Class<?> storeClientClass = resolveStoreClientClass(storeOperations);
 		return ReflectionUtils.findMethod(storeClientClass, methodName, null);  // find by name
+	}
+
+	private Class<?> resolveStoreClientClass(StoreOperations storeOperations) {
+		return ((StoreClientHolder) storeOperations).getStoreClient().getClass();
 	}
 
 	private String[] resolveParameterNames(Method actualMethod) {
@@ -113,7 +126,7 @@ public class StoreOperationController {
 					params[i] = param;
 				} catch (IOException e) {
 					final String message =
-							String.format("Cannot parse part of the json for parameter=[%s]. json=[%s]", parameterName, subJson);
+							e.getMessage() + ". parameter=[" + parameterName + "] json=[" + subJson + "]";
 					throw new EvernoteRestException(message, e);
 				}
 			} else {
