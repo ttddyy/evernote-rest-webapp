@@ -25,6 +25,13 @@
         <url>git@github.com:ttddyy/evernote-rest-webapp.git</url>
     </scm>
 
+    <distributionManagement>
+        <repository>
+            <id>bintray</id>
+            <url>https://api.bintray.com/maven/ttddyy/maven/evernote-rest-webapp</url>
+        </repository>
+    </distributionManagement>
+
     <developers>
         <developer>
             <id>tadaya</id>
