@@ -1,6 +1,9 @@
 package net.ttddyy.evernote.rest;
 
 import com.evernote.auth.EvernoteService;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -138,6 +141,47 @@ public class Application {
 
 		return evernote;
 	}
+
+	/**
+	 * override spring-boot default ObjectMapper to configure output(serialization) json.
+	 *
+	 * @see org.springframework.boot.autoconfigure.web.HttpMessageConvertersAutoConfiguration.ObjectMappers#jacksonObjectMapper()
+	 */
+	@Bean
+	public ObjectMapper jacksonObjectMapper() {
+
+		// use different visibility for serialization(output json)
+		// I want to ONLY change the visibility for serialization, but couldn't find nice way to do it.
+		// maybe related to this issue: https://github.com/FasterXML/jackson-databind/issues/352
+		// for now, override ObjectMapper and set new SerializationConfig in instance initializer.
+		// TODO: find correct way to do this.
+		final ObjectMapper mapper = new ObjectMapper() {
+			{
+				// use instance fields for output json
+				_serializationConfig = _serializationConfig.with(
+						_serializationConfig.getDefaultVisibilityChecker()
+								.withGetterVisibility(JsonAutoDetect.Visibility.NONE)
+								.withIsGetterVisibility(JsonAutoDetect.Visibility.NONE)
+								.withSetterVisibility(JsonAutoDetect.Visibility.NONE)
+								.withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
+								.withFieldVisibility(JsonAutoDetect.Visibility.ANY)
+				);
+			}
+		};
+
+		// mix-in to ignore thrift specific fields for serialization.
+		mapper.addMixInAnnotations(Object.class, ThriftPropertyJacksonFilter.class);
+
+		return mapper;
+	}
+
+	/**
+	 * Mix-in class for Jackson to ignore thrift specific fields in serialization.
+	 */
+	@JsonIgnoreProperties("__isset_vector")
+	private static abstract class ThriftPropertyJacksonFilter {
+	}
+
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(Application.class, args);
