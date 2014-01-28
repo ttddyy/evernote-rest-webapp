@@ -2,6 +2,8 @@ package net.ttddyy.evernote.rest;
 
 import com.evernote.edam.notestore.NoteFilter;
 import com.evernote.edam.type.*;
+import com.evernote.edam.userstore.AuthenticationResult;
+import com.evernote.edam.userstore.PublicUserInfo;
 
 import java.util.*;
 
@@ -376,5 +378,134 @@ public class TestDomainUtils {
 
 	public static byte[] getByteBAR() {
 		return new byte[]{66, 65, 82};  // "BAR" as byte. "BAR", base64 encoded value is "QkFS"
+	}
+
+	public static PublicUserInfo getPublicUserInfo() {
+		PublicUserInfo publicUserInfo = new PublicUserInfo();
+		publicUserInfo.setUserId(100);
+		publicUserInfo.setShardId("SHARDID");
+		publicUserInfo.setPrivilege(PrivilegeLevel.VIP);
+		publicUserInfo.setUsername("USERNAME");
+		publicUserInfo.setNoteStoreUrl("NOTE_STORE_URL");
+		publicUserInfo.setWebApiUrlPrefix("WEB_API_URL_PREFIX");
+		return publicUserInfo;
+	}
+
+	public static User getUser() {
+
+		UserAttributes attributes = new UserAttributes();
+		attributes.setDefaultLocationName("DEFAULT_LOCATION_NAME");
+		attributes.setDefaultLatitude(10.01);
+		attributes.setDefaultLongitude(12.12);
+		attributes.setPreactivation(true);
+		attributes.setViewedPromotions(Arrays.asList("VIEWED_PROMOTIONS_1", "VIEWED_PROMOTIONS_2"));
+		attributes.setIncomingEmailAddress("INCOMING_EMAIL_ADDRESS");
+		attributes.setRecentMailedAddresses(Arrays.asList("RECENT_MAILED_ADDRESSES_1", "RECENT_MAILED_ADDRESSES_2"));
+		attributes.setComments("COMMENTS");
+		attributes.setDateAgreedToTermsOfService(20L);
+		attributes.setMaxReferrals(30);
+		attributes.setReferralCount(40);
+		attributes.setRefererCode("REFERER_CODE");
+		attributes.setSentEmailDate(200L);
+		attributes.setSentEmailCount(50);
+		attributes.setDailyEmailLimit(60);
+		attributes.setEmailOptOutDate(300L);
+		attributes.setPartnerEmailOptInDate(400L);
+		attributes.setPreferredLanguage("PREFERRED_LANGUAGE");
+		attributes.setPreferredCountry("PREFERRED_COUNTRY");
+		attributes.setClipFullPage(true);
+		attributes.setTwitterUserName("TWITTER_USER_NAME");
+		attributes.setTwitterId("TWITTER_ID");
+		attributes.setGroupName("GROUP_NAME");
+		attributes.setRecognitionLanguage("RECOGNITION_LANGUAGE");
+		attributes.setReferralProof("REFERRAL_PROOF");
+		attributes.setEducationalDiscount(true);
+		attributes.setBusinessAddress("BUSINESS_ADDRESS");
+		attributes.setHideSponsorBilling(true);
+		attributes.setTaxExempt(true);
+		attributes.setUseEmailAutoFiling(true);
+		attributes.setReminderEmailConfig(ReminderEmailConfig.SEND_DAILY_EMAIL);
+
+		Accounting accounting = new Accounting();
+		accounting.setUploadLimit(1000L);
+		accounting.setUploadLimitEnd(1010L);
+		accounting.setUploadLimitNextMonth(1020L);
+		accounting.setPremiumServiceStatus(PremiumOrderStatus.ACTIVE);
+		accounting.setPremiumOrderNumber("PREMIUM_ORDER_NUMBER");
+		accounting.setPremiumCommerceService("PREMIUM_COMMERCE_SERVICE");
+		accounting.setPremiumServiceStart(1030L);
+		accounting.setPremiumServiceSKU("PREMIUM_SERVICE_SKU");
+		accounting.setLastSuccessfulCharge(1040L);
+		accounting.setLastFailedCharge(1050L);
+		accounting.setLastFailedChargeReason("LAST_FAILED_CHARGE_REASON");
+		accounting.setNextPaymentDue(1060L);
+		accounting.setPremiumLockUntil(1070L);
+		accounting.setUpdated(1080L);
+		accounting.setPremiumSubscriptionNumber("PREMIUM_SUBSCRIPTION_NUMBER");
+		accounting.setLastRequestedCharge(1090L);
+		accounting.setCurrency("CURRENCY");
+		accounting.setUnitPrice(200);
+		accounting.setBusinessId(300);
+		accounting.setBusinessName("BUSINESS_NAME");
+		accounting.setBusinessRole(BusinessUserRole.ADMIN);
+		accounting.setUnitDiscount(400);
+		accounting.setNextChargeDate(1100L);
+
+		BusinessUserInfo businessUserInfo = new BusinessUserInfo();
+		businessUserInfo.setBusinessId(50);
+		businessUserInfo.setBusinessName("BUSINESS_NAME");
+		businessUserInfo.setRole(BusinessUserRole.ADMIN);
+		businessUserInfo.setEmail("EMAIL");
+
+		User user = new User();
+		user.setId(100);
+		user.setUsername("USERNAME");
+		user.setEmail("EMAIL");
+		user.setName("NAME");
+		user.setTimezone("TIMEZONE");
+		user.setPrivilege(PrivilegeLevel.VIP);
+		user.setCreated(100);
+		user.setUpdated(200);
+		user.setDeleted(300);
+		user.setActive(true);
+		user.setShardId("SHARD_ID");
+		user.setAttributes(attributes);
+		user.setAccounting(accounting);
+		user.setPremiumInfo(getPremiumInfo());
+		user.setBusinessUserInfo(businessUserInfo);
+
+		return user;
+	}
+
+	public static AuthenticationResult getAuthenticationResult() {
+
+		AuthenticationResult authenticationResult = new AuthenticationResult();
+		authenticationResult.setCurrentTime(100L);
+		authenticationResult.setAuthenticationToken("AUTHENTICATION_TOKEN");
+		authenticationResult.setExpiration(200L);
+		authenticationResult.setUser(getUser());
+		authenticationResult.setPublicUserInfo(getPublicUserInfo());
+		authenticationResult.setNoteStoreUrl("NOTE_STORE_URL");
+		authenticationResult.setWebApiUrlPrefix("WEB_API_URL_PREFIX");
+		authenticationResult.setSecondFactorRequired(true);
+		authenticationResult.setSecondFactorDeliveryHint("SECOND_FACTOR_DELIVERY_HINT");
+
+		return authenticationResult;
+	}
+
+	public static PremiumInfo getPremiumInfo() {
+		PremiumInfo premiumInfo = new PremiumInfo();
+		premiumInfo.setCurrentTime(2000L);
+		premiumInfo.setPremium(true);
+		premiumInfo.setPremiumRecurring(true);
+		premiumInfo.setPremiumExpirationDate(2010L);
+		premiumInfo.setPremiumExtendable(true);
+		premiumInfo.setPremiumPending(true);
+		premiumInfo.setPremiumCancellationPending(true);
+		premiumInfo.setCanPurchaseUploadAllowance(true);
+		premiumInfo.setSponsoredGroupName("SPONSORED_GROUP_NAME");
+		premiumInfo.setSponsoredGroupRole(SponsoredGroupRole.GROUP_ADMIN);
+		premiumInfo.setPremiumUpgradable(true);
+		return premiumInfo;
 	}
 }

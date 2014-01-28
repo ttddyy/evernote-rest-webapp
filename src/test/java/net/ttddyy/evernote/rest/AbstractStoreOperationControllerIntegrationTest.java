@@ -20,6 +20,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -89,8 +90,8 @@ public abstract class AbstractStoreOperationControllerIntegrationTest {
 		when(this.evernote.noteStoreOperations()).thenReturn(noteStoreOperations);
 	}
 
-	protected void performRequest(String url, String content) throws Exception {
-		mockMvc.perform(post(url).content(content).contentType(MediaType.APPLICATION_JSON));
+	protected ResultActions performRequest(String url, String content) throws Exception {
+		return mockMvc.perform(post(url).content(content).contentType(MediaType.APPLICATION_JSON));
 	}
 
 }
