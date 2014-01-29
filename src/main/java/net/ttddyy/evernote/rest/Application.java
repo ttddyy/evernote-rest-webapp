@@ -4,6 +4,7 @@ import com.evernote.auth.EvernoteService;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -52,6 +53,7 @@ public class Application {
 		public EvernoteService environment = EvernoteService.SANDBOX;  // default is sandbox
 		public String userAgent;
 		public Map<String, String> customHeaders = new HashMap<String, String>();
+		public boolean formatOutput = false;
 
 		public void setEnvironment(EvernoteService environment) {
 			this.environment = environment;
@@ -89,6 +91,11 @@ public class Application {
 		public Map<String, String> getCustomHeaders() {
 			return customHeaders;
 		}
+
+		public void setFormatOutput(boolean formatOutput) {
+			this.formatOutput = formatOutput;
+		}
+
 	}
 
 
@@ -166,6 +173,10 @@ public class Application {
 								.withCreatorVisibility(JsonAutoDetect.Visibility.NONE)
 								.withFieldVisibility(JsonAutoDetect.Visibility.ANY)
 				);
+
+				if (evernotePropertiesConfiguration.formatOutput) {
+					_serializationConfig = _serializationConfig.with(SerializationFeature.INDENT_OUTPUT);
+				}
 			}
 		};
 
