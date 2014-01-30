@@ -13,6 +13,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.SpringBootServletInitializer;
 import org.springframework.context.annotation.*;
+import org.springframework.core.DefaultParameterNameDiscoverer;
+import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.social.evernote.api.Evernote;
 import org.springframework.social.evernote.api.impl.EvernoteTemplate;
 import org.springframework.social.evernote.connect.EvernoteConnectionFactory;
@@ -193,6 +195,13 @@ public class Application {
 	private static abstract class ThriftPropertyJacksonFilter {
 	}
 
+	/**
+	 * To maximize the caching feature in name discoverer, inject as a bean instead of creating every time.
+	 */
+	@Bean
+	public ParameterNameDiscoverer parameterNameDiscoverer() {
+		return new DefaultParameterNameDiscoverer();
+	}
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(Application.class, args);

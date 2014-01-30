@@ -33,6 +33,9 @@ public class StoreOperationController {
 	@Autowired
 	private ObjectMapper objectMapper;
 
+	@Autowired
+	private ParameterNameDiscoverer parameterNameDiscoverer;
+
 	@RequestMapping(value = "/{methodName}", method = RequestMethod.POST)
 	public Object invoke(@PathVariable String storeName, @PathVariable String methodName,
 	                     @RequestBody(required = false) JsonNode jsonNode) {
@@ -81,7 +84,7 @@ public class StoreOperationController {
 	 * Based on received json, deserialize parameters.
 	 */
 	private Object[] resolveParameters(Method actualMethod, JsonNode jsonNode) {
-		final String[] parameterNames = resolveParameterNames(actualMethod);
+		final String[] parameterNames = parameterNameDiscoverer.getParameterNames(actualMethod);
 		if (parameterNames == null) {
 			final String message = String.format("Cannot find parameter names for method=[%s].", actualMethod.getName());
 			throw new EvernoteRestException(message);
@@ -96,12 +99,6 @@ public class StoreOperationController {
 	private Class<?> resolveStoreClientClass(StoreOperations storeOperations) {
 		return ((StoreClientHolder) storeOperations).getStoreClient().getClass();
 	}
-
-	private String[] resolveParameterNames(Method actualMethod) {
-		final ParameterNameDiscoverer discoverer = new DefaultParameterNameDiscoverer();
-		return discoverer.getParameterNames(actualMethod);
-	}
-
 
 	private Object[] resolveParameterValues(String[] parameterNames, JavaType[] javaTypes, JsonNode jsonNode) {
 
