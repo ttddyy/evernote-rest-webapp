@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
-import org.springframework.core.ResolvableType;
 import org.springframework.social.evernote.api.Evernote;
 import org.springframework.social.evernote.api.StoreClientHolder;
 import org.springframework.social.evernote.api.StoreOperations;
@@ -16,9 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Tadaya Tsuyukubo
@@ -35,6 +30,9 @@ public class StoreOperationController {
 
 	@Autowired
 	private ParameterNameDiscoverer parameterNameDiscoverer;
+
+	@Autowired
+	private ParameterJavaTypeDiscoverer parameterJavaTypeDiscoverer;
 
 	@RequestMapping(value = "/{methodName}", method = RequestMethod.POST)
 	public Object invoke(@PathVariable String storeName, @PathVariable String methodName,
@@ -92,7 +90,7 @@ public class StoreOperationController {
 
 		// to allow jackson to map generic type in collection appropriately, such as List<Long> or List<Short>,
 		// object mapper requires JavaType to be provided. Otherwise, generics for number gets default to List<Integer>.
-		final JavaType[] parameterJavaTypes = resolveMethodParameterJavaTypes(actualMethod);
+		final JavaType[] parameterJavaTypes = parameterJavaTypeDiscoverer.getParameterJavaTypes(actualMethod);
 		return resolveParameterValues(parameterNames, parameterJavaTypes, jsonNode);
 	}
 
@@ -125,38 +123,6 @@ public class StoreOperationController {
 			}
 		}
 		return params;
-	}
-
-	private JavaType[] resolveMethodParameterJavaTypes(Method actualMethod) {
-		final Class<?>[] parameterTypes = actualMethod.getParameterTypes();
-		final List<JavaType> javaTypes = new ArrayList<JavaType>(parameterTypes.length);
-		for (int i = 0; i < parameterTypes.length; i++) {
-			final Class<?> parameterType = parameterTypes[i];
-			final boolean isList = parameterType.isAssignableFrom(List.class);
-			final boolean isSet = parameterType.isAssignableFrom(Set.class);
-
-			final JavaType type;
-			if (isList || isSet) {
-				// resolve generic type
-				final ResolvableType resolvableType = ResolvableType.forMethodParameter(actualMethod, i);
-				final Class<?> genericClass = resolvableType.getGeneric(0).resolve();
-				if (genericClass == null) {
-					// if couldn't resolve generic type, fallback to parameter type
-					type = this.objectMapper.constructType(parameterType);
-				} else {
-					if (isList) {
-						type = this.objectMapper.getTypeFactory().constructCollectionType(List.class, genericClass);
-					} else {
-						type = this.objectMapper.getTypeFactory().constructCollectionType(Set.class, genericClass);
-					}
-				}
-			} else {
-				type = this.objectMapper.constructType(parameterType);
-			}
-
-			javaTypes.add(type);
-		}
-		return javaTypes.toArray(new JavaType[javaTypes.size()]);
 	}
 
 }

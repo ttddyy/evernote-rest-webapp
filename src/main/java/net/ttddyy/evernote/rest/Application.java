@@ -203,6 +203,11 @@ public class Application {
 		return new DefaultParameterNameDiscoverer();
 	}
 
+	@Bean
+	public ParameterJavaTypeDiscoverer parameterJavaTypeDiscoverer() {
+		return new ParameterJavaTypeDiscoverer();
+	}
+
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(Application.class, args);
 	}
