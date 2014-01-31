@@ -8,7 +8,9 @@ import org.springframework.core.ResolvableType;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Find jackson's {@link JavaType}.
@@ -20,13 +22,25 @@ public class ParameterJavaTypeDiscoverer {
 	@Autowired
 	private ObjectMapper objectMapper = new ObjectMapper();  // set default
 
+	private final Map<Method, JavaType[]> javaTypesCache = new ConcurrentHashMap<Method, JavaType[]>();
+
 	/**
-	 * Resolve jackson's {@link JavaType}s for given method's parameters.
+	 * Resolve jackson {@link JavaType}s for the given method's parameters.
 	 *
-	 * @param actualMethod
-	 * @return
+	 * @param actualMethod a method to resolve parameters
+	 * @return array of JavaTypes
 	 */
 	public JavaType[] getParameterJavaTypes(Method actualMethod) {
+		JavaType[] javaTypes = this.javaTypesCache.get(actualMethod);
+		if (javaTypes == null) {
+			javaTypes = resolveParameterJavaTypes(actualMethod);
+			this.javaTypesCache.put(actualMethod, javaTypes);
+		}
+		return javaTypes;
+	}
+
+	private JavaType[] resolveParameterJavaTypes(Method actualMethod) {
+
 		final Class<?>[] parameterTypes = actualMethod.getParameterTypes();
 		final List<JavaType> javaTypes = new ArrayList<JavaType>(parameterTypes.length);
 		for (int i = 0; i < parameterTypes.length; i++) {
