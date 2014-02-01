@@ -3,8 +3,6 @@ package net.ttddyy.evernote.rest;
 import com.evernote.auth.EvernoteAuth;
 import com.evernote.auth.EvernoteService;
 import com.evernote.clients.ClientFactory;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.Test;
 import org.springframework.social.evernote.api.Evernote;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -172,20 +170,6 @@ public class ApplicationConfigEvernoteBeanTest {
 		assertThat(customHeaders, hasEntry("bar", "BAR"));
 		assertThat(customHeaders, hasEntry("bar", "BAR"));
 
-	}
-
-	@Test
-	public void testFormatOutput() {
-		Application application = new Application();
-		application.evernotePropertiesConfiguration = new Application.EvernotePropertiesConfiguration();
-
-		// default is false
-		ObjectMapper mapper = application.jacksonObjectMapper();
-		assertThat(mapper.getSerializationConfig().isEnabled(SerializationFeature.INDENT_OUTPUT), is(false));
-
-		application.evernotePropertiesConfiguration.setFormatOutput(true);
-		mapper = application.jacksonObjectMapper();
-		assertThat(mapper.getSerializationConfig().isEnabled(SerializationFeature.INDENT_OUTPUT), is(true));
 	}
 
 
