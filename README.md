@@ -9,6 +9,8 @@ It is built on top of [Spring Boot](http://projects.spring.io/spring-boot/),
 [Sprnig Social Evernote](https://github.com/ttddyy/spring-social-evernote/), and
 [evernote-java-sdk](https://github.com/evernote/evernote-sdk-java).
 
+![System Overview](https://docs.google.com/drawings/d/1mX9zJ_zKJy86XPvTFg1XIQRJTknj-bpyb6dKxsBs2ZQ/pub?w=960&h=720 "system overview")
+
 
 ## REST API Sample
 
