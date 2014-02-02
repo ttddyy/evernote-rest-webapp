@@ -11,6 +11,8 @@ It is built on top of [Spring Boot](http://projects.spring.io/spring-boot/),
 
 ![System Overview](https://docs.google.com/drawings/d/1mX9zJ_zKJy86XPvTFg1XIQRJTknj-bpyb6dKxsBs2ZQ/pub?w=960&h=720 "system overview")
 
+\* As long as OAuth token has handled, *YOUR APPLICATION can be anything*, such as javascript, ios, android, or an application server.
+
 
 ## REST API Sample
 
