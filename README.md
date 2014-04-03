@@ -75,6 +75,18 @@ $ curl -X POST -H "Content-Type: application/json"
    http://localhost:8080/noteStore/findNotes
 ```
 
+# How To Get
+
+- [Download From Bintray](https://bintray.com/ttddyy/maven/evernote-rest-webapp/view)
+  - Get war file.
+- Or, build from sourcecode
+```
+ $ git clone git@github.com:ttddyy/evernote-rest-webapp.git
+ $ cd evernote-rest-webapp
+ $ mvn package    # war file is generated under target directory
+```
+
+
 # Documentation
 
 - [Evernote REST Webapp Reference](https://github.com/ttddyy/evernote-rest-webapp/wiki)
