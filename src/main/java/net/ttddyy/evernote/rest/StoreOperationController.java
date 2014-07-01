@@ -4,12 +4,15 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.boot.actuate.metrics.GaugeService;
 import org.springframework.core.ParameterNameDiscoverer;
 import org.springframework.social.evernote.api.Evernote;
 import org.springframework.social.evernote.api.StoreClientHolder;
 import org.springframework.social.evernote.api.StoreOperations;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -34,9 +37,16 @@ public class StoreOperationController {
 	@Autowired
 	private ParameterJavaTypeDiscoverer parameterJavaTypeDiscoverer;
 
+	@Autowired
+	private CounterService counterService;
+
+	@Autowired
+	private GaugeService gaugeService;
+
+
 	@RequestMapping(value = "/{methodName}", method = RequestMethod.POST)
 	public Object invoke(@PathVariable String storeName, @PathVariable String methodName,
-	                     @RequestBody(required = false) JsonNode jsonNode) {
+						 @RequestBody(required = false) JsonNode jsonNode) {
 
 		final StoreOperations storeOperations = getStoreOperations(storeName);
 		final Class<?> storeOperationsClass = storeOperations.getClass();
@@ -61,9 +71,30 @@ public class StoreOperationController {
 			params = resolveParameters(actualMethod, jsonNode);
 		}
 
+		// metric format:
+		//   evernote.api.[userStore|noteStore].<method>.[succeeded|failed]
+		//   evernote.api.[userStore|noteStore].<method>.response
+		final String metricNamePrefix = "evernote.api." + storeName + "." + methodName; // evernote.api.[userStore|noteStore].<method>
+
+		final StopWatch stopWatch = new StopWatch();
 		try {
-			return ReflectionUtils.invokeMethod(method, storeOperations, params);
+
+			stopWatch.start();
+			Object result = ReflectionUtils.invokeMethod(method, storeOperations, params);
+			stopWatch.stop();
+
+			counterService.increment(metricNamePrefix + ".succeeded");
+			gaugeService.submit(metricNamePrefix + ".response", stopWatch.getTotalTimeMillis());
+
+			return result;
 		} catch (Exception e) {
+
+			if (stopWatch.isRunning()) {
+				stopWatch.stop();
+			}
+
+			counterService.increment(metricNamePrefix + ".failed");
+
 			final String message = String.format("Failed to invoke method. method=[%s], storeClient=[%s], params=[%s]",
 					method.getName(), actualStoreClientClass, ObjectUtils.nullSafeToString(params));
 			throw new EvernoteRestException(message, e);

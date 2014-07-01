@@ -23,7 +23,7 @@
         <developerConnection>scm:git:git@github.com:ttddyy/evernote-rest-webapp.git</developerConnection>
         <url>git@github.com:ttddyy/evernote-rest-webapp.git</url>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
 
     <distributionManagement>
         <repository>
