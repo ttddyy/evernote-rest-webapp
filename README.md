@@ -75,6 +75,28 @@ $ curl -X POST -H "Content-Type: application/json"
    http://localhost:8080/noteStore/findNotes
 ```
 
+
+# What’s New
+
+## 1.1 (not yet released)
+
+- spring-boot has been updated to 1.1.4.RELEASE
+- added metrics for evernote api calls (store client operations)
+  - number of success and failure calls to evernote endpoints
+  - response time for evernote api call
+
+*sample:*
+
+```
+# metrics endpoint:
+#    http://localhost:8080/management/metrics
+...
+"counter.evernote.api.noteStore.listTags.succeeded": 3,   # num of successful evernote api calls
+"gauge.evernote.api.noteStore.listTags.response": 42,     # evernote api call response time (ms)
+...
+```
+
+
 # How To Get
 
 - [Download From Bintray](https://bintray.com/ttddyy/maven/evernote-rest-webapp/view)
