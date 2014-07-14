@@ -121,7 +121,7 @@ $ curl -X POST -H "Content-Type: application/json"
 | evernote-rest-webapp |    spring-boot | spring-social-evernote | evernote-sdk-java |
 | --------------------:| --------------:| ----------------------:| -----------------:|
 |                  1.0 |  1.0.0.RELEASE |                  1.0.1 |            1.25.1 |
-|         1.1-SNAPSHOT |  1.1.3.RELEASE |                  1.0.1 |            1.25.1 |
+|         1.1-SNAPSHOT |  1.1.4.RELEASE |                  1.0.2 |            1.25.1 |
 
 
 ## Continuous Integration
