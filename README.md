@@ -78,7 +78,7 @@ $ curl -X POST -H "Content-Type: application/json"
 
 # What’s New
 
-## 1.1 (not yet released)
+## 1.1 (2014-07-15)
 
 - spring-boot has been updated to 1.1.4.RELEASE
 - added metrics for evernote api calls (store client operations)
@@ -121,7 +121,7 @@ $ curl -X POST -H "Content-Type: application/json"
 | evernote-rest-webapp |    spring-boot | spring-social-evernote | evernote-sdk-java |
 | --------------------:| --------------:| ----------------------:| -----------------:|
 |                  1.0 |  1.0.0.RELEASE |                  1.0.1 |            1.25.1 |
-|         1.1-SNAPSHOT |  1.1.4.RELEASE |                  1.0.2 |            1.25.1 |
+|                  1.1 |  1.1.4.RELEASE |                  1.0.2 |            1.25.1 |
 
 
 ## Continuous Integration
