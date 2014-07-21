@@ -26,7 +26,8 @@ public class OAuthController {
 
 	@RequestMapping("/auth")
 	public Map<String, String> authorization(@RequestParam String callbackUrl,
-	                                         @RequestParam(required = false) boolean preferRegistration) {
+	                                         @RequestParam(required = false) boolean preferRegistration,
+	                                         @RequestParam(required = false) boolean supportLinkedSandbox) {
 
 		// obtain request token (temporal credential)
 		final OAuth1Operations oauthOperations = this.evernoteConnectionFactory.getOAuthOperations();
@@ -36,6 +37,9 @@ public class OAuthController {
 		final OAuth1Parameters parameters = new OAuth1Parameters();
 		if (preferRegistration) {
 			parameters.set("preferRegistration", "true");  // create account
+		}
+		if (supportLinkedSandbox) {
+			parameters.set("supportLinkedSandbox", "true");
 		}
 		final String authorizeUrl = oauthOperations.buildAuthorizeUrl(requestToken.getValue(), parameters);
 

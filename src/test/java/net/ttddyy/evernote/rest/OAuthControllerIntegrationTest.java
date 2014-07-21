@@ -95,6 +95,24 @@ public class OAuthControllerIntegrationTest {
 	}
 
 	@Test
+	public void testAuthorizationWithSupportLinkedSandbox() throws Exception {
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("oauth_token=" + "TOKEN");
+		sb.append("&oauth_token_secret=" + "SECRET");
+		sb.append("&oauth_callback_confirmed=" + "true");
+		mockServer.expect(requestTo("https://sandbox.evernote.com/oauth"))
+				.andRespond(withSuccess(sb.toString(), MediaType.TEXT_PLAIN));
+
+		mockMvc.perform(post("/oauth/auth")
+				.param("callbackUrl", "foo")
+				.param("supportLinkedSandbox", "true"))
+				.andExpect(jsonPath("$.authorizeUrl").value("https://sandbox.evernote.com/OAuth.action?oauth_token=TOKEN&supportLinkedSandbox=true"));
+
+		mockServer.verify();
+	}
+
+	@Test
 	public void testAccessToken() throws Exception {
 
 		StringBuilder sb = new StringBuilder();
