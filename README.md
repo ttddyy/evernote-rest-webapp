@@ -82,6 +82,15 @@ $ curl -X POST -H "Content-Type: application/json"
 - support `supportLinkedSandbox` parameter in oauth
   - see API change detail: [App Notebooks feature](https://dev.evernote.com/doc/articles/app_notebook.php)
 
+*sample:*
+
+```shell
+$ curl -X POST -d "supportLinkedSandbox=true" -d "callbackUrl=http://myapp/oauth-callback" http://localhost:8080/oauth/auth
+{
+  "authorizeUrl":".../OAuth.action?oauth_token=...&supportLinkedSandbox=true", ...
+}
+```
+
 
 ## 1.1 (2014-07-15)
 
