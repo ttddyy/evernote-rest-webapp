@@ -95,8 +95,10 @@ public class StoreOperationController {
 
 			counterService.increment(metricNamePrefix + ".failed");
 
-			final String message = String.format("Failed to invoke method. method=[%s], storeClient=[%s], params=[%s]",
-					method.getName(), actualStoreClientClass, ObjectUtils.nullSafeToString(params));
+			final String message = String.format(
+					"Failed to invoke method. method=[%s], storeClient=[%s], params=[%s], caused-by=[%s] exception-message=[%s]",
+					method.getName(), actualStoreClientClass, ObjectUtils.nullSafeToString(params), e.getClass().getName(), e.getMessage()
+			);
 			throw new EvernoteRestException(message, e);
 		}
 	}
