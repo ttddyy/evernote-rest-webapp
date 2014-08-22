@@ -2,6 +2,7 @@ package net.ttddyy.evernote.rest;
 
 import org.junit.Test;
 
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -14,6 +15,7 @@ public class StoreOperationControllerMiscIntegrationTest extends AbstractStoreOp
 
 	@Test
 	public void testNoInputForNoParameterMethod() throws Exception {
+		given(userStoreOperations.isBusinessUser()).willReturn(true);
 		mockMvc.perform(post("/userStore/isBusinessUser"));
 		verify(userStoreOperations).isBusinessUser();
 	}
