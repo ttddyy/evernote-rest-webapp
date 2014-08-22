@@ -1,7 +1,7 @@
 # What’s New
 
 ## 1.1.2 (2014-08-21)
-- improved error response
+- improved error response messages, especially for EDAMUserException, EDAMSystemException and EDAMNotFoundException.
 ```json
 {
    "timestamp":1408681609240,
@@ -11,6 +11,8 @@
    "message":"com.evernote.edam.error.EDAMUserException, ErrorCode [PERMISSION_DENIED(3)], Parameter [authenticationToken]"
 }
 ```
+- spring-boot has been updated to 1.1.5.RELEASE
+
 
 ## 1.1.1 (2014-07-22)
 - support `supportLinkedSandbox` parameter in oauth
