@@ -1,5 +1,17 @@
 # What’s New
 
+## 1.1.2 (2014-08-21)
+- improved error response
+```json
+{
+   "timestamp":1408681609240,
+   "status":400,
+   "error":"Bad Request",
+   "exception":"org.springframework.social.evernote.api.EvernoteException",
+   "message":"com.evernote.edam.error.EDAMUserException, ErrorCode [PERMISSION_DENIED(3)], Parameter [authenticationToken]"
+}
+```
+
 ## 1.1.1 (2014-07-22)
 - support `supportLinkedSandbox` parameter in oauth
   - see API change detail: [App Notebooks feature](https://dev.evernote.com/doc/articles/app_notebook.php)
