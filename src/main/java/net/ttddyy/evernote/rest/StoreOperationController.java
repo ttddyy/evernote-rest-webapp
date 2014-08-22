@@ -6,15 +6,23 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.metrics.CounterService;
 import org.springframework.boot.actuate.metrics.GaugeService;
+import org.springframework.boot.autoconfigure.web.ErrorAttributes;
 import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.http.HttpStatus;
 import org.springframework.social.evernote.api.Evernote;
+import org.springframework.social.evernote.api.EvernoteException;
 import org.springframework.social.evernote.api.StoreClientHolder;
 import org.springframework.social.evernote.api.StoreOperations;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StopWatch;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+import org.springframework.web.servlet.view.InternalResourceView;
+import org.springframework.web.util.WebUtils;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.lang.reflect.Method;
 
@@ -43,10 +51,14 @@ public class StoreOperationController {
 	@Autowired
 	private GaugeService gaugeService;
 
+	@Autowired
+	private ErrorAttributes errorAttributes;
+
 
 	@RequestMapping(value = "/{methodName}", method = RequestMethod.POST)
 	public Object invoke(@PathVariable String storeName, @PathVariable String methodName,
-						 @RequestBody(required = false) JsonNode jsonNode) {
+						 @RequestBody(required = false) JsonNode jsonNode,
+						 HttpServletRequest request, HttpServletResponse response) {
 
 		final StoreOperations storeOperations = getStoreOperations(storeName);
 		final Class<?> storeOperationsClass = storeOperations.getClass();
@@ -99,7 +111,20 @@ public class StoreOperationController {
 					"Failed to invoke method. method=[%s], storeClient=[%s], params=[%s], caused-by=[%s] exception-message=[%s]",
 					method.getName(), actualStoreClientClass, ObjectUtils.nullSafeToString(params), e.getClass().getName(), e.getMessage()
 			);
-			throw new EvernoteRestException(message, e);
+
+			if (e instanceof EvernoteException && ((EvernoteException) e).isEDAMException()) {
+				// For EDAM*Exception, return status=BAD_REQUEST(400), and do not throw exception, so that server-side
+				// will not write out the exception since this is an client error.
+				// Using spring-boot's BasicErrorController to generate response to client
+
+				// expose exception where BasicErrorController can pick-up. maybe too detail...
+				((HandlerExceptionResolver) errorAttributes).resolveException(request, response, null, e);  // delegate to spring-boot infrastructure...
+				request.setAttribute(WebUtils.ERROR_STATUS_CODE_ATTRIBUTE, HttpStatus.BAD_REQUEST.value());  // response status code
+
+				return new InternalResourceView("/error");
+			} else {
+				throw new EvernoteRestException(message, e);
+			}
 		}
 	}
 
