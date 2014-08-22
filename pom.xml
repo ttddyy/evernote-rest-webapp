@@ -68,7 +68,7 @@
         <dependency>
             <groupId>net.ttddyy</groupId>
             <artifactId>spring-social-evernote</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.3</version>
         </dependency>
 
         <dependency>
