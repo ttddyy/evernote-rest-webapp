@@ -134,6 +134,7 @@ $ curl -X POST -d "supportLinkedSandbox=true" -d "callbackUrl=http://myapp/oauth
 
 | evernote-rest-webapp |    spring-boot | spring-social-evernote | evernote-sdk-java |
 | --------------------:| --------------:| ----------------------:| -----------------:|
+|                1.1.2 |  1.1.5.RELEASE |                  1.0.3 |            1.25.1 |
 |           1.1, 1.1.1 |  1.1.4.RELEASE |                  1.0.2 |            1.25.1 |
 |                  1.0 |  1.0.0.RELEASE |                  1.0.1 |            1.25.1 |
 
